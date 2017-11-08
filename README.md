@@ -11,6 +11,6 @@ to run a local web server
 http://127.0.0.1:8887
 ```
 
-Visit the [Leth Development page](http://leth.inzhoop.com/developmnent) and use this URL to setup the wallet pointing to your local store.
+Visit the [Leth Development page](http://leth.inzhoop.com/developmnent.html) and use this URL to setup the wallet pointing to your local store.
 
 List your basic demo dappleth, edit and test using web LETH development version.
