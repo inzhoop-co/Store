@@ -1,0 +1,26 @@
+[
+   {
+      "id": 1,
+      "name": "",
+      "description": "",
+      "status": {
+         "id": 0
+      },
+      "position": {
+         "location": "Hotel Zone, Blvd. Kukulcan, La Isla Shopping Village Km.12",
+         "city": "Cancun",
+         "lat": "",
+         "long": ""
+      },
+      "date": "November 1, 2017",
+      "time": "6:30 PM ~ (UTC-05:00)",
+      "deposit": 0.05,
+      "limit": 20,
+      "users": 0,
+      "participants": [],
+      "assets": {
+         "banner": "https://www.inzhoop.com/repository/Ropsten/4/1_banner.png",
+         "logo": "info.logo"
+      }
+   }
+]
