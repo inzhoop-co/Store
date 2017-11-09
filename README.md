@@ -1,4 +1,4 @@
-# Do you want to delivery your dapp on mobile client?
+# Do you want to deliver your dapp on mobile client?
 ## Stop writing your own wallet  from scratch or fighting in order to make responsive your web dapp, simply write a UI for your smart contract and LETH’s run your code.
 - - - -
 # Store
@@ -21,6 +21,7 @@ http://127.0.0.1:8887
 3. Visit the [Leth Development page](http://leth.inzhoop.com/development.html) .
 4. Create your wallet (only once).
 5. Dappleths listed initially are loaded form official store endpoint.
+  5.1 You need to use some plugin to enable [CORS-Origin](https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi) 
 6. Input your local URL to setup the wallet pointing to your local store.
 7. Now Dappleths are listed from your cloned local store.
 8. Edit the Dappleths and refresh wallet page to watch your changes.
