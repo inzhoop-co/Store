@@ -1,59 +1,33 @@
-<style>
-/*	
-	Dappleth UI could use ionic 1.x css 
-	components 
-		https://ionicframework.com/docs/v1/components/ 
-	icons
-		http://ionicons.com/
-	Use <style> to add your custom additional css
-*/
-</style>
-<dappleth-header>
-<!-- 	Header Page
-		An empty header will include a default header.
-		
-		Attributes: 
-		- styleclass
-			Use styleclass to set a custom class to header
-			i.e.: <dappleth-header styleclass="bar bar-header bar-positive">
-				to set a blue (positive) bar
-			(see https://ionicframework.com/docs/v1/components/ for more...)
-
-		Footer tags can be removed, mind to add some button to close Dappleth
-			i.e.:   <button class="button button-clear" on-touch="close()">
-						<i class="icon ion-ios-arrow-back dark"></i>
-					</button>
--->
-</dappleth-header>
+<dappleth-header styleclass="bar bar-header bar-positive">
+<button class="button button-clear" on-touch="$ionicGoBack()">
+  <i class="icon ion-ios-close-outline"></i>
+</button>
+</dappleth-header >
 <dappleth-content>
-<!-- 	Content Page
-		Write your Page using all the components of Ionic 1.x
-		visit https://ionicframework.com/docs/v1/components/ for more
-		i.e.: 	<div class="list">
-				  <a class="item item-icon-left" ng-click="getMails()">
-				    <i class="icon ion-email"></i>
-				    Check mail
-				  </a>
-				</div>
-	
-		You can otherwise write your own html and css in this content page
--->
-
-	<div class="card item-avatar-left">
-		<h3>Hello World <i class="icon ion-ios-world"></i></h3>
-	</div>
+  <div class="card">
+    <div class="item-divider">
+        <img ng-src="http://www.inzhoop.com/dappleths/dapp_1/logo_full.png">
+    </div>
+    <div class="item item-body">
+       A DAppleth is a light DApp that allow you to intercat with smart contracts directly from this mobile wallet.
+    </div>
+  </div>
+  <button class="button button-block button-positive" ng-click="greet()">
+    Why don't you test me?
+    <i class="icon ion-thumbsup"></i>
+  </button>
+  <div class="card" ng-if="call">
+      <div class="item-divider" >
+        Response {{Dapp.activeApp.Address | strLimit: 15 : 5 }}
+    </div>
+    <div class="item item-text-wrap">
+      {{greeting}}
+    </div>
+    <a class="item text-right item-icon-right dark" ng-click="clearResponse()">
+      <i class="icon ion-ios-close-outline"></i>
+      Close
+    </a>
+  </div>
+  <!--dappleth-chat height="330px"/-->
 </dappleth-content>
-<dappleth-footer>
-<!-- 	Footer Page
-		An empty footer will include a default header.
-		
-		Attributes: 
-		- styleclass
-			Use styleclass to set a custom class to header
-			i.e.: <dappleth-header styleclass="bar bar-header bar-positive">
-				to set a blue (positive) bar
-			(see https://ionicframework.com/docs/v1/components/ for more...)
-
-		Footer tags can be removed.
--->
-</dappleth-footer>
+<dappleth-footer styleclass="bar bar-footer bar-positive"/>
