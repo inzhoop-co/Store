@@ -1,0 +1,98 @@
+<style>
+/* custom additional css */
+body {
+  cursor: url('https://ionicframework.com/img/finger.png'), auto;
+}
+
+$black: #3f4041;
+
+.black {
+  background-color: #3f4041 !important;
+  color: #ffffff;
+  .scroll-content {
+    background-color: #3f4041 !important;
+  }
+  .item {
+    background-color: $black;
+    border: none;
+    border-top: 1px solid #464646;
+    border-bottom: 2px solid #333333;
+    padding: 20px;
+    color: #F0F1F1;
+    max-height: none;
+
+    &:last-child {
+      border-bottom: 1px solid #333333;
+    }
+    &.current{ background-color:darken( $black, 10% )   !important;
+       border-top: 1px solid #464646 !important;
+    border-bottom: 2px solid #333333 !important;
+      p,h3{opacity: .7;}
+            }
+  }
+  h2,
+  h3,
+  p,
+  a{
+    color: #F0F1F1;
+  }
+}
+.black-head {
+  text-decoration: none;
+}
+</style>
+<dappleth-header styleclass="bar bar-header bar-dark">
+<!-- header page  -->
+	<button class="button button-clear button-energized" ng-click="openMenu()">
+		<i class="icon ion-arrow-swap"></i>
+	</button>
+</dappleth-header>
+<dappleth-content>
+<!-- content page  -->
+
+	<ion-side-menus>
+		<ion-side-menu-content>
+			<ion-content class="dark">
+				<div class="card divider">
+					Your balance is {{myBalance() | currency:'ETH ':6}} 
+				</div>
+				<ion-list>
+					<ion-item class="item item-avatar-left  item-icon-right item-avatar-right" ng-repeat="coin in listTokens track by $index" type="item-text-wrap" on-hold="showCustomTokenInfo(coin)">
+			          	<img ng-src="{{coin.Logo}}"/>
+					    <label>{{coin.Name}}
+					    	<span class="subdued" "> {{coin.Symbol}} </span>
+					    </label>
+					    <p>
+					      <label><b>0</b></label>
+					    </p>
+					    <span><i class="icon"><img ng-src="img/ethereum-icon.png" height="40px" /></i>
+					    </span>
+					    <ion-option-button style="padding-top: 40px; font-size: 12px;" class="button-balanced" ng-click="buy(coin)">
+			              <i class="icon ion-bag"></i>
+			              <span>Buy</span>
+			            </ion-option-button>
+				  	</ion-item>
+			  	</ion-list>
+
+			</ion-content>
+		</ion-side-menu-content>
+		
+		<ion-side-menu side="right">
+			<!-- ... -->
+				<ion-list>
+					<ion-item class="item item-dark" ng-repeat="r in listRates track by $index" type="item-text-wrap">
+					    <label class="balanced"><b>{{r.pair}}</b>
+					    	<span class="item-note" "> {{r.rate}} </span>
+					    </label>
+					    <p>
+					      <label class="balanced subdued">{{r.balance}}</label>
+					    </p>
+				  	</ion-item>
+			  	</ion-list>
+		</ion-side-menu>
+	</ion-side-menus>
+
+</dappleth-content>
+<dappleth-footer styleclass="bar bar-footer bar-dark">
+<!-- footer page  -->
+</dappleth-footer>

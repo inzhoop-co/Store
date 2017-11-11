@@ -4,7 +4,7 @@
 		{
 			"Name": "Development",
 			"Description": "Write your Dappleth",
-			"List":["0"]
+			"List":["0","5"]
 		},
 		{
 			"Name": "Lab",
@@ -130,6 +130,28 @@
 			},
 			"Descriptions" : {
 				"Title": "No Block No Party",
+				"Abstract": "Funny dimostrative game"
+			}
+		},
+		{
+			"GUID": "5",
+			"Name" : "ThreeJs Demo",
+			"Company" : "FunFair",
+			"Url" :{
+				"Install" : "index.html",
+				"Template" : "index.html",
+				"Script" : "index.js"
+			},
+			"Contracts" :[
+				{"Address":"0x", "ABI": [] }
+			],
+			"Logo" :{ 
+				"Full":"logo.png",
+				"Mini":"logomini.png",
+				"Banner":"logo.png"
+			},
+			"Descriptions" : {
+				"Title": "Demo ThreeJs",
 				"Abstract": "Funny dimostrative game"
 			}
 		}

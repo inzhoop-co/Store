@@ -1,6 +1,6 @@
 var dappleth = (function(){ 
     var dappContract;
-    var path = "https://www.inzhoop.com/repository/Ropsten/3/assets/";
+    var path;
     var birdURI;
     var pipeURI;
     var jumpBtnURI;
@@ -146,6 +146,8 @@ var dappleth = (function(){
         $scope = core.scope;
         $service = core.service;
         Dapp = $scope.Dapp.activeApp;
+        path = Dapp.Path + "assets/";
+
         _start();
     };
 
