@@ -55,7 +55,7 @@ $black: #3f4041;
 				<div class="list">
 				  <div class="item item-input-inset">
 				    <label class="item-input-wrapper">
-				      <input type="text" placeholder="Amount to exchange">
+				      <input type="number" ng-model="amount" placeholder="Amount to exchange">
 				    </label>
 				    <button class="button button-clear">
 				      <img ng-src="{{logoToken}}" width="45px" />
@@ -63,15 +63,12 @@ $black: #3f4041;
 				  </div>
 				</div>
 				<div class="lis card" ng-repeat="t in listTokens track by $index">
-					<div class="item item-avatar" >
+					<div class="item item-avatar-left item-icon-right" >
 					    <img src="{{t.Logo}}">
 					    <h2>{{t.Name}}</h2>
-					    <p>{{t.Symbols}} 13456.00</p>
+					    <p>{{t.Symbols + rates(t)}} </p>
+					    <button class="button button-clear button-balanced icon ion-ios-shuffle"></button>
 					 </div>
-					 <div class="item item-divider">
-					      <a href="#" class="subdued">1 Like</a>
-					      <a href="#" class="subdued">5 Comments</a>
-					  </div>
 				</div>
 			</ion-content>
 		</ion-side-menu-content>

@@ -35,17 +35,10 @@ var dappleth = (function(){
 		myBalance: function(){
 			return $service.balance()
 		},
-		getETHPrice: function(tokenAddr){
-			var pairs = dappContract.getPairInfo(0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee,tokenAddr);
-			console.log(pairs);
-			//var price = dappContract.getPairInfo(0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee,tokenAddr);
-			//console.log(tokenAddr, price);
-			//return price*1;
-		},
-		getPrice: function(source,dest){
-			//var price = dappContract.getPrice(source,dest);
-			//console.log(tokenAddr, price);
-			//return price*1;
+		rates: function(token){
+			var value = dappContract.getRate(dappContract.ETH_TOKEN_ADDRESS(), token.Address, 1);
+			console.log(token.Address, value);
+			return value[2] * 1;
 		},
 		buy: function(coin){
 			alert('to do...');
