@@ -49,31 +49,30 @@ $black: #3f4041;
 </dappleth-header>
 <dappleth-content>
 <!-- content page  -->
-
 	<ion-side-menus>
 		<ion-side-menu-content>
-			<ion-content class="dark">
-				<div class="card divider">
-					Your balance is {{myBalance() | currency:'ETH ':6}} 
+			<ion-content>
+				<div class="list">
+				  <div class="item item-input-inset">
+				    <label class="item-input-wrapper">
+				      <input type="text" placeholder="Amount to exchange">
+				    </label>
+				    <button class="button button-clear">
+				      <img ng-src="{{logoToken}}" width="45px" />
+				    </button>
+				  </div>
 				</div>
-				<ion-list>
-					<ion-item class="item item-avatar-left  item-icon-right item-avatar-right" ng-repeat="coin in listTokens track by $index" type="item-text-wrap" on-hold="showCustomTokenInfo(coin)">
-			          	<img ng-src="{{coin.Logo}}"/>
-					    <label>{{coin.Name}}
-					    	<span class="subdued" "> {{coin.Symbol}} </span>
-					    </label>
-					    <p>
-					      <label><b>0</b></label>
-					    </p>
-					    <span><i class="icon"><img ng-src="img/ethereum-icon.png" height="40px" /></i>
-					    </span>
-					    <ion-option-button style="padding-top: 40px; font-size: 12px;" class="button-balanced" ng-click="buy(coin)">
-			              <i class="icon ion-bag"></i>
-			              <span>Buy</span>
-			            </ion-option-button>
-				  	</ion-item>
-			  	</ion-list>
-
+				<div class="lis card" ng-repeat="t in listTokens track by $index">
+					<div class="item item-avatar" >
+					    <img src="{{t.Logo}}">
+					    <h2>{{t.Name}}</h2>
+					    <p>{{t.Symbols}} 13456.00</p>
+					 </div>
+					 <div class="item item-divider">
+					      <a href="#" class="subdued">1 Like</a>
+					      <a href="#" class="subdued">5 Comments</a>
+					  </div>
+				</div>
 			</ion-content>
 		</ion-side-menu-content>
 		

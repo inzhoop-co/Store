@@ -12,7 +12,7 @@ var dappleth = (function(){
 		dappContract = web3.eth.contract(Dapp.Contracts[0].ABI).at(Dapp.Contracts[0].Address);
 		reverseContract = web3.eth.contract(Dapp.Contracts[1].ABI).at(Dapp.Contracts[1].Address);
 		$scope.listRates=[];
-		
+		$scope.logoToken = 'img/ethereum-icon.png'; //Dapp.Path + 'digix-logo.png';
 
 		angular.extend($scope, context);
 		_start();		
