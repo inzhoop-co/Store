@@ -1,9 +1,9 @@
 # Do you want to deliver your dapp on mobile client?
-## Stop writing your own wallet  from scratch or fighting in order to make responsive your web dapp, simply write a UI for your smart contract and LETH’s run your code.
+## Stop writing your own wallet from scratch or fighting in order to make responsive your web dapp, simply write a UI for your smart contract and LETH’s run your code.
 - - - -
 # Store
 Dappleth Store for Inzhoop mobile wallet LETH.
-Inzhoop LETH mobile wallet is available in Beta test on Google play store, TestFlight iOS and a live web demo (visit Inzhoop.com for details).
+Inzhoop LETH mobile wallet is available in beta test on Google play store, TestFlight iOS and a live web demo (visit Inzhoop.com for details).
 To help you develop and test your mobile dapp we provide a web environment running the wallet so you don’t need to install anything expect your preferred IDE.
 
 Inzhoop mobile wallet provide an engine to run thirty part dapps (called Dappleth) without the need to reinvent the wheel.
@@ -66,3 +66,5 @@ On the $service instance you could invoke the following methods:
 - toggleLeft()
 - toggleRight()
 - getPosition()
+- loadScripts(list)
+- loadCSS(list)
