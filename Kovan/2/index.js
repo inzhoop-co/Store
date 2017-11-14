@@ -40,6 +40,11 @@ var dappleth = (function(){
 			console.log(token.Address, value);
 			return value[2] * 1;
 		},
+		getPrice: function(token){
+			var res = dappContract.getPrice(dappContract.ETH_TOKEN_ADDRESS(), token.Address);
+			console.log(res);
+			return res * 1;
+		},
 		buy: function(coin){
 			alert('to do...');
       		$service.closeOptionButtons();

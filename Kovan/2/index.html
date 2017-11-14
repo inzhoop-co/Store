@@ -70,8 +70,8 @@ $black: #3f4041;
 				<div class="lis card" ng-repeat="t in listTokens track by $index">
 					<div class="item item-avatar-left item-icon-right" >
 					    <img src="{{t.Logo}}">
-					    <h2>{{t.Name}}</h2>
-					    <p>{{t.Symbols}} 1033.12090</p>
+					    <h2>{{t.Name + ' ' + t.Symbols}}</h2>
+					    <p>{{getPrice(t)}}</p>
 					    <button class="button button-clear button-balanced icon ion-ios-shuffle"></button>
 					 </div>
 				</div>
