@@ -1,4 +1,3 @@
-
 var dappleth = (function(){
 	var dappContract;
 	var Dapp;

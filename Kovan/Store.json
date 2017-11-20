@@ -6,6 +6,12 @@
 			"Description": "",
 			"Network" : "Kovan",
 			"List" : ["1","2"]
+		},
+		{
+			"Name" : "Game",
+			"Description": "",
+			"Network" : "Kovan",
+			"List" : ["5"]
 		}
 		
 	],
@@ -54,6 +60,28 @@
 			"Descriptions" : {
 				"Title": "Exchange",
 				"Abstract": "Dapp to intercat with Kyber Exchange"
+			}
+		},
+		{
+			"GUID": "5",
+			"Name" : "ThreeJs Demo",
+			"Company" : "FunFair",
+			"Url" :{
+				"Install" : "index.html",
+				"Template" : "index.html",
+				"Script" : "index.js"
+			},
+			"Contracts" :[
+				{"Address":"0x", "ABI": [] }
+			],
+			"Logo" :{ 
+				"Full":"logo.png",
+				"Mini":"logomini.png",
+				"Banner":"logo.png"
+			},
+			"Descriptions" : {
+				"Title": "Demo ThreeJs",
+				"Abstract": "Funny dimostrative game"
 			}
 		}
 						

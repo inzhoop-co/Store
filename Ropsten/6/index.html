@@ -9,21 +9,9 @@
 */
 </style>
 <dappleth-header styleclass="bar bar-header bar-royal">
-<!-- 	Header Page
-		An empty header will include a default header.
-		
-		Attributes: 
-		- styleclass
-			Use styleclass to set a custom class to header
-			i.e.: <dappleth-header styleclass="bar bar-header bar-positive">
-				to set a blue (positive) bar
-			(see https://ionicframework.com/docs/v1/components/ for more...)
-
-		Footer tags can be removed, mind to add some button to close Dappleth
-			i.e.:   <button class="button button-clear" on-touch="close()">
-						<i class="icon ion-ios-arrow-back dark"></i>
-					</button>
--->
+	<button class="button button-clear" on-touch="createModal()">
+	  <i class="icon ion-ios-plus-empty"></i>
+	</button>
 </dappleth-header>
 <dappleth-content>
 <!-- 	Content Page
@@ -39,38 +27,29 @@
 		You can otherwise write your own html and css in this content page
 -->
 
+ 	<div class="item-input-inset">
+	 	<label class="item-input-wrapper">
+	      <i class="icon ion-ios-search placeholder-icon"></i>
+	      <input type="search" placeholder="Search" ng-model="search.title">     
+	      <button class="icon button-icon ion-ios-close-empty placeholder-icon dark" ng-if="search.title.length > 0" on-touch="search.title=''"></button>
+	    </label>
+	</div>
 	<div class="list">
+		<div class="item item-avatar" ng-repeat="BOP in getList() | orderBy: 'state' | filter:search track by $index">
+			<img ng-src="{{BOP.iconPayer}}"/>
+			<h2><b>{{BOP.title | strLimit: 30 : 0}}</b></h2>
+	      	<p>{{BOP.balance}}</p>
 
-	    <div class="item item-input-inset">
-		    <label class="item-input-wrapper">
-		      <input type="text" placeholder="Title">
-		    </label>
-		 </div>
-
-		<div class="item item-input">
-			<textarea rows="5" placeholder="Initial statement"></textarea>
+	      	<span ng-switch="BOP.state">
+	      		<i class="badge badge-balanced" ng-switch-when="0">Open</i>
+	      		<i class="badge badge-calm" ng-switch-when="1">Comm.</i>
+	      		<i class="badge badge-stable" ng-switch-when="2">Closed</i>
+            </span>
+	      	<span class="item-note" ng-show="BOP.worker!='0x0000000000000000000000000000000000000000'">
+	      		<img ng-src="{{BOP.iconWorker}}"/>	      	
+	      	</span> 
+			
 		</div>
-
-		<label class="item item-input item-floating-label">
-		    <span class="input-label">Payment amount</span>
-		    <input type="number" ng-model="amount" placeholder="Payment amount">
-		</label>
-
-		<label class="item item-input item-floating-label">
-		    <span class="input-label">Service deposit</span>
-		    <input type="number" ng-model="deposit" placeholder="Service deposit">
-		</label>
-
-		<label class="item item-input item-floating-label">
-		    <span class="input-label">Autorelease timer</span>
-		    <input type="number" ng-model="timer" placeholder="Autorelease timer">
-		</label>
-
-	  <button class="button button-block button-outline button-royal item-icon-right" ng-click="create()">
-	    <i class="icon ion-play"></i>
-	    Create BOP
-	  </button>
-
 	</div>
 
 </dappleth-content>
