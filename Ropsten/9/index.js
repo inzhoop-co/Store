@@ -13,6 +13,9 @@ var dappleth = (function(){
 		Dapp = $scope.Dapp.activeApp;
 		//install contract on global variable dappContract (could be an array of contracts)
 		dappContract = web3.eth.contract(Dapp.Contracts[0].ABI).at(Dapp.Contracts[0].Address);
+		
+		$scope.address = $service.address();
+
 		//extend angular core scope with the scope of this Dapps		
 		angular.extend($scope, context);		
 	}
@@ -38,25 +41,6 @@ var dappleth = (function(){
 		//exit and return to wallet
 		close: function(){
 			$service.exit();
-		},
-		//basic void sample function
-		getMail: function(){
-			console.log('getMail called!');
-		},
-		browse: function(){
-			//var app = $service.inAppBrowser();
-			var win = window.open("http://www.inzhoop.com/browse.html",'_self','location=yes','closebuttoncaption=Return');
-			win.addEventListener("loadstop", function(){
-				win.executeScript(
-					{ 
-						code: "web3 " 
-					},
-					function(value){
-						console.log(value[0]);
-					}
-				);
-
-			});
 		}
 	};
 	

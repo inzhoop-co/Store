@@ -1,0 +1,71 @@
+<style>
+/*	
+	Dappleth UI could use ionic 1.x css 
+	components 
+		https://ionicframework.com/docs/v1/components/ 
+	icons
+		http://ionicons.com/
+	Use <style> to add your custom additional css
+*/
+
+.wall{
+	background-color: #444;
+	background-image: url({{Dapp.activeApp.Path + 'LOGO_HELBIZ.png'}});
+	background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center; 
+}
+</style>
+<dappleth-header styleclass="bar bar-header bar-dark">
+
+</dappleth-header>
+<dappleth-content class="wall">
+
+	<div class="list card">
+	  <div class="item item-avatar item-divider">
+	    <img ng-src="{{Dapp.activeApp.Path + Dapp.activeApp.Logo.Full}}">
+	    <h2>Helbiz</h2>
+	    <p>{{labelSale}}</p>
+	    <div ng-switch="saleState">
+	  		<span class="badge badge-royal" ng-switch-when="-1">presale</span>
+	  		<span class="badge badge-balanced" ng-switch-when="2">running</span>
+	  		<span class="badge badge-assertive" ng-switch-when="3">ended</span>
+	  		<span class="badge badge-positive" ng-switch-when="4">closed</span>
+	  	</div>
+	  </div>
+	  <div class="item" ng-show="saleState > -1">
+	  	<div>Price: <b>{{tokenPrice}}</b> Ξ</div>
+	  	<div>Tokens #: <b>{{totAmount}}</b> {{saleSymbol}}</div>
+	  	<div>Remaining #: <b>{{onSale}}</b></div>
+
+	  	<div>End date: <b>{{endDate | date:'medium'}}</b></div>
+	  </div>
+
+	  <div class="item" ng-show="saleState == -1">
+	  	<div>Tokens #: <b>{{toClaim}}</b> {{preSymbol}}</div>
+	  	<div>End date: <b>{{endDatePresale | date:'medium'}}</b></div>
+	  </div>
+
+	  <a class="item item-icon-left calm" href="#" ng-if="toClaim>0">
+	    <i class="icon ion-pie-graph"></i>
+	    {{preSymbol}} {{balanceHbg}} balance
+	  </a>
+	  <a class="item item-icon-left calm" href="#" ng-if="saleState > -1">
+	    <i class="icon ion-pie-graph"></i>
+	    {{saleSymbol}} {{balanceHbz}} balance
+	  </a>
+
+	</div>
+
+	<button class="button button-block button-outline button-calm" ng-click="claim()" ng-if="saleState==-1 && toClaim!=balanceHbg">Claim</button>
+
+	<label class="item item-input item-floating-label" ng-if="saleState==2">
+    	<span class="input-label">Amount</span>
+   		<input type="number" placeholder="Ether to buy" ng-model="formData.Amount"/>
+	</label>
+	<button class="button button-block button button-balanced" ng-disabled="!formData.Amount" ng-if="saleState==2" ng-click="buy(formData.Amount)">buy {{formData.Amount/tokenPrice}} {{saleSymbol}}</button>
+
+</dappleth-content>
+<dappleth-footer styleclass="bar bar-footer bar-dark">
+
+</dappleth-footer>

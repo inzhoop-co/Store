@@ -18,6 +18,9 @@ var dappleth = (function(){
 		//install contract on global variable dappContract (could be an array of contracts)
 		BOPFactory = web3.eth.contract(Dapp.Contracts[0].ABI).at(Dapp.Contracts[0].Address);
 		BOPContract = web3.eth.contract(Dapp.Contracts[1].ABI);
+
+		$scope.myAddress = $service.address();
+		$scope.orderType='state';
 		//extend angular core scope with the scope of this Dapps
 		angular.extend($scope, context);	
 
@@ -27,7 +30,7 @@ var dappleth = (function(){
 	var _start= function(){
 		$scope.fetchAllBOPs();
 		$scope.dappRefresh()
-	}
+	};
 
 	//exit internal method
 	var _exit = function(){
@@ -45,7 +48,7 @@ var dappleth = (function(){
 	    state: new web3.BigNumber(state[2]).toNumber(),
 	    worker: state[3].toString(),
 	  	iconWorker: blockies.create({seed: state[3].toString()}).toDataURL("image/jpeg"),	    
-	    balance: new web3.BigNumber(state[4]).toNumber(),
+	    balance: new web3.BigNumber(state[4]).toNumber() / 1.0e18 ,
 	    serviceDeposit: new web3.BigNumber(state[5]),
 	    amountDeposited: new web3.BigNumber(state[6]),
 	    amountBurned: new web3.BigNumber(state[7]),
@@ -54,6 +57,34 @@ var dappleth = (function(){
 	    autoreleaseTime: new web3.BigNumber(state[10])
 	  };
 	  listBOPs.push(BOP);
+	};
+
+	var _callNewBOP = function(valueInEth, payer, serviceDepositInEth, autoreleaseIntervalInDays, title, initialPayerStatement) {
+	    var valueInWei = web3.toWei(valueInEth, 'ether');
+	    var serviceDepositInWei = web3.toWei(serviceDepositInEth, 'ether');
+	    var autoreleaseIntervalInSeconds = autoreleaseIntervalInDays*24*60*60;
+
+		var gasPrice = web3.eth.gasPrice; 
+		var gasLimit = 3000000;
+
+	    BOPFactory.newBurnableOpenPayment(payer, serviceDepositInWei, 
+	    			autoreleaseIntervalInSeconds, title, initialPayerStatement, 
+					{'from': payer, 'value': valueInWei, 
+					'gas': gasLimit, 'gasPrice' : gasPrice}, 
+					_handleNewBOPResult);
+	};
+
+	var _handleNewBOPResult = function(err, res) {
+	  if (err) 
+	  	alert(err.message);
+	  else {
+	    console.log(res);
+	  }
+	};
+
+	function _web3CallbackLogIfError(err, res) {
+	  if (err) console.log(err.message);
+	  $scope.dappRefresh();
 	}
 
     //container for function binded on UI 
@@ -71,10 +102,77 @@ var dappleth = (function(){
 		close: function(){
 			$service.exit();
 		},
-		//basic void sample function
-		create: function(){
-			console.log(dappContract);
+		chooseSort: function(){
+			var actionSheet = $service.actionSheet();
+			var hideSheet = actionSheet.show({
+		      buttons: [
+		        { text: '<i class="ion-bag"></i> Balance'  },
+		        { text: '<i class="ion-flag"></i> State' },
+		        { text: '<i class="ion-help-buoy"></i> ...' }
+
+		      ],
+		      titleText: 'Sort by',
+		      destructiveButtonClicked:  function() {
+		        hideSheet();
+		      },
+		      buttonClicked: function(index) {
+		      	switch(this.buttons[index].index){
+		          case 0: // invite friend
+		          	$scope.orderType = 'balance';
+		            break;
+		          case 1: // invite friend
+		          	$scope.orderType = 'state';
+		            break;
+		        }
+				hideSheet();
+
+		        $scope.dappRefresh();
+		      }
+		    });
+		},
+		createBOP: function(form){
 			console.log('create called!');
+			var valueInEth = form.amount;
+			var payer = $scope.myAddress;
+			var serviceDepositInEth = form.deposit;
+			var autoreleaseIntervalInDays = form.release;
+			var title = form.title;
+			var initialPayerStatement = form.statement;		
+
+			_callNewBOP(valueInEth, payer, serviceDepositInEth, autoreleaseIntervalInDays, title, initialPayerStatement);
+
+		},
+		callCommit: function(address) {
+			console.log(address);
+			var BOP = web3.eth.contract(Dapp.Contracts[1].ABI).at(address);
+		  	BOP.commit({'from': $scope.myAddress,'value': BOP.serviceDeposit(), 'gas':300000, 'gasPrice' : web3.eth.gasPrice}, _web3CallbackLogIfError);
+		},
+		callRelease: function(index,amountInWei) {
+		  listBOPs[index].release(amountInWei, {'gas':300000}, web3CallbackLogIfError);
+		},
+	 	callBurn: function(index,amountInWei) {
+		  listBOPs[index].burn(amountInWei, {'gas':300000}, web3CallbackLogIfError);
+		},
+		callBurn: function(index, amountInWei) {
+		  listBOPs[index].burn(amountInWei, {'gas':300000}, web3CallbackLogIfError);
+		},
+		callAddFunds: function(index,includedEth) {
+			listBOPs[index].addFunds({'value':web3.toWei(includedEth,'ether')}, web3CallbackLogIfError)
+		},
+		delayAutorelease: function(index) {
+			listBOPs[index].delayAutorelease(web3CallbackLogIfError);
+		},
+		triggerAutorelease: function(index) {
+	  		listBOPs[index].triggerAutorelease(web3CallbackLogIfError);
+		},
+		callRecoverFunds: function(index) {
+		  listBOPs[index].recoverFunds(web3CallbackLogIfError);
+		},
+		callLogPayerStatement: function(index,statement) {
+		  listBOPs[index].logPayerStatement(statement, web3CallbackLogIfError);
+		},
+		callLogWorkerStatement: function(index,statement) {
+	  		listBOPs[index].logWorkerStatement(statement, web3CallbackLogIfError);
 		},
 		createModal: function(){
 			myModal = $service.pageModal();		
@@ -90,6 +188,22 @@ var dappleth = (function(){
 		closeModal: function(){
 			myModal.hide();
 		    myModal.remove();
+		},
+		openBOPInfo: function(BOP){
+			$scope.BOP = BOP;
+			infoModal = $service.pageModal();		
+		    infoModal.fromTemplateUrl(Dapp.Path + 'info.html', {
+		      scope: $scope,
+		      animation: 'slide-in-up'
+		    }).then(function (modal) {
+		      infoModal = modal;
+		      infoModal.show();
+		      console.log('modal opened!');
+		    });
+		},
+		closeInfoModal: function(){
+			infoModal.hide();
+		    infoModal.remove();
 		},
 		getList: function(){
 			return listBOPs;
@@ -138,7 +252,6 @@ var dappleth = (function(){
 		    }
 		  });
 		}
-
 	};
 	
 	//don't edit: start and end functions called externally

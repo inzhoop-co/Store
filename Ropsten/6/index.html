@@ -14,31 +14,20 @@
 	</button>
 </dappleth-header>
 <dappleth-content>
-<!-- 	Content Page
-		Write your Page using all the components of Ionic 1.x
-		visit https://ionicframework.com/docs/v1/components/ for more
-		i.e.: 	<div class="list">
-				  <a class="item item-icon-left" ng-click="getMails()">
-				    <i class="icon ion-email"></i>
-				    Check mail
-				  </a>
-				</div>
-	
-		You can otherwise write your own html and css in this content page
--->
-
  	<div class="item-input-inset">
 	 	<label class="item-input-wrapper">
 	      <i class="icon ion-ios-search placeholder-icon"></i>
-	      <input type="search" placeholder="Search" ng-model="search.title">     
+	      <input type="search" placeholder="Search" ng-model="search.title" style="width: -webkit-fill-available;">     
 	      <button class="icon button-icon ion-ios-close-empty placeholder-icon dark" ng-if="search.title.length > 0" on-touch="search.title=''"></button>
 	    </label>
+		<button class="button button-clear button-icon ion-ios-more-outline dark"  ng-click="chooseSort()">
+		</button>    	    
 	</div>
-	<div class="list">
-		<div class="item item-avatar" ng-repeat="BOP in getList() | orderBy: 'state' | filter:search track by $index">
+	<ion-list class="list">
+		<ion-item class="item item-avatar" ng-repeat="BOP in getList() | orderBy: orderType | filter:search track by $index">
 			<img ng-src="{{BOP.iconPayer}}"/>
-			<h2><b>{{BOP.title | strLimit: 30 : 0}}</b></h2>
-	      	<p>{{BOP.balance}}</p>
+			<h2><b>{{BOP.title | strLimit: 25 : 0}}</b></h2>
+	      	<p>Ξ {{BOP.balance}}</p>
 
 	      	<span ng-switch="BOP.state">
 	      		<i class="badge badge-balanced" ng-switch-when="0">Open</i>
@@ -48,9 +37,14 @@
 	      	<span class="item-note" ng-show="BOP.worker!='0x0000000000000000000000000000000000000000'">
 	      		<img ng-src="{{BOP.iconWorker}}"/>	      	
 	      	</span> 
-			
-		</div>
-	</div>
+			<ion-option-button class="button-calm" ng-click="openBOPInfo(BOP)">
+              <i class="icon ion-information"></i>
+            </ion-option-button>
+			<ion-option-button class="button-balanced" ng-click="callCommit(BOP.address)">
+              <i class="icon ion-ios-checkmark-outline"></i>
+            </ion-option-button>
+		</ion-item>
+	</ion-list>
 
 </dappleth-content>
 <dappleth-footer styleclass="bar bar-footer bar-royal">

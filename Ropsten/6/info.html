@@ -1,0 +1,32 @@
+<ion-modal-view>
+  <ion-header-bar class="bar-royal">
+    <button  class="button button-clear" ng-click="closeInfoModal()">
+      <i class="icon ion-ios-close"></i>
+    </button>
+    <div class="h1 title">Info</div>
+  </ion-header-bar>
+  <ion-content class="has-header" padding="'true'">
+    
+    <div class="list card">
+
+      <div class="item item-avatar">
+        <img ng-src="{{BOP.iconPayer}}"/>
+        <h2>{{BOP.title}}</h2>
+        <p>{{BOP.address | strLimit: 25 : 0}}</p>
+      </div>
+
+      <div class="item item-body">
+        <!--img class="full-image" src="delorean.jpg"-->
+        <p>
+          This is initial statement.
+        </p>
+        <p>
+          <span class="subdued">{{BOP.amountDeposit}}</span>
+          <span class="subdued">{{BOP.balance}}</span>
+        </p>
+      </div>
+
+    </div>
+
+  </ion-content>
+</ion-modal-view>

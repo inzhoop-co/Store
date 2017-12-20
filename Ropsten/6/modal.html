@@ -1,0 +1,42 @@
+<ion-modal-view>
+  <ion-header-bar class="bar-royal">
+    <button  class="button button-clear" ng-click="closeModal()">
+      <i class="icon ion-ios-close"></i>
+    </button>
+    <div class="h1 title">Sample modal</div>
+  </ion-header-bar>
+  <ion-content class="has-header" padding="'true'">
+    <div class="list">
+
+      <div class="item item-input-inset">
+          <label class="item-input-wrapper">
+            <input type="text" placeholder="Title" ng-model="modal.title"/>
+          </label>
+      </div>
+
+      <div class="item item-input">
+        <textarea rows="5" placeholder="Initial statement" ng-model="modal.statement"></textarea>
+      </div>
+
+      <label class="item item-input item-floating-label">
+          <span class="input-label">Payment amount</span>
+          <input type="number" ng-model="modal.amount" placeholder="Payment amount">
+      </label>
+
+      <label class="item item-input item-floating-label">
+          <span class="input-label">Service deposit</span>
+          <input type="number" ng-model="modal.deposit" placeholder="Service deposit">
+      </label>
+
+      <label class="item item-input item-floating-label">
+          <span class="input-label">Autorelease timer</span>
+          <input type="number" ng-model="modal.release" placeholder="Autorelease timer">
+      </label>
+
+      <button class="button button-block button-outline button-royal item-icon-right" ng-click="createBOP(modal)">
+        <i class="icon ion-play"></i>
+        Create BOP
+      </button>
+    </div>
+  </ion-content>
+</ion-modal-view>

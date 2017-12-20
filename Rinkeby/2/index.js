@@ -10,9 +10,7 @@ var dappleth = (function(){
 
 		Dapp = $scope.Dapp.activeApp;
 		dappContract = web3.eth.contract(Dapp.Contracts[0].ABI).at(Dapp.Contracts[0].Address);
-		reverseContract = web3.eth.contract(Dapp.Contracts[1].ABI).at(Dapp.Contracts[1].Address);
 		
-
 		$scope.myAddress = $service.address();
 		$scope.amount=0;
 		$scope.listRates=[];
@@ -29,7 +27,7 @@ var dappleth = (function(){
 		$scope.listRates.push({'pair': 'GNT - ETH', 'rate': 0.00096722, 'balance': 5.20});
 		//!		
 
-		$scope.availableTokens.push({'Name': 'DGD', 'Symbol': 'DGD', 'Decimals': 18, 'Logo': 'digix-logo.png', "Address":'0x94dd60e21ea28c253259adabec45ecb7ccaaa1a2'});
+		$scope.availableTokens.push({'Name': 'DGD', 'Symbol': 'DGD', 'Decimals': 18, 'Logo': 'digix-logo.png', "Address":'0x62377e0fdb31709c945fc2846155c8aed70f676d'});
 
 		/*
 		OMG : 0xf26a8e0fa25fe9e750114e27a46777d49cb8063c
@@ -76,7 +74,7 @@ var dappleth = (function(){
 			var srcAmount = web3.toWei(amount);
             var dest = token.Address;
             var destAddress = $scope.myAddress;
-            var maxDestAmount=2**256 - 1;
+            var maxDestAmount=250;
             var minConversionRate=1;
             var throwOnFailure=true;
             var walletId=19; 

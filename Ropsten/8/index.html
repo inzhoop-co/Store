@@ -1,0 +1,45 @@
+<style>
+
+</style>
+<dappleth-header styleclass="bar bar-header bar-positive">
+
+</dappleth-header>
+<dappleth-content>
+
+	<div class="list card">
+	  <div class="item item-avatar item-divider">
+	    <img ng-src="{{Dapp.activeApp.Path + Dapp.activeApp.Logo.Full}}">
+	    <h2>ICO Engine</h2>
+	    <p>Demo access token sale</p>
+	  </div>
+
+	  <div class="item">
+	  	<div>Price: <b>{{tokenPrice}}</b> Ξ</div>
+	  	<div>Tokens #: <b>{{totAmount}}</b></div>
+	  	<div>Remaining #: <b>{{onSale}}</b></div>
+
+	  	<div>End date: <b>{{endDate | date:'medium'}}</b></div>
+	  	
+	  	<div ng-switch="state">
+	  		<span class="badge badge-stable" ng-switch-when="0">unvailable</span>
+	  		<span class="badge badge-dark" ng-switch-when="1">init</span>
+	  		<span class="badge badge-balanced" ng-switch-when="2">open</span>
+	  		<span class="badge badge-assertive" ng-switch-when="3">ended</span>
+	  		<span class="badge badge-positive" ng-switch-when="4">closed</span>
+	  	</div>
+	  </div>
+
+	  <a class="item item-icon-left dark" href="#">
+	    <i class="icon ion-pie-graph"></i>
+	    {{balanceToken()}} NameT coin
+	  </a>
+	</div>
+	<label class="item item-input item-floating-label">
+    	<span class="input-label">Amount</span>
+   		<input type="number" placeholder="Ether to buy" ng-model="amount">
+	</label>
+	<button class="button button-block button-outline button-positive" ng-click="buy(amount)">buy</button>
+
+</dappleth-content>
+<dappleth-footer styleclass="bar bar-footer bar-positive">
+</dappleth-footer>
