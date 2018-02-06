@@ -47,8 +47,8 @@
 		<ion-item class="item item-avatar" ng-repeat="user in favorFriends() | filter:search track by $index">
 			<img ng-src="{{user.icon}}"/>
 			<h2><b>{{user.name | strLimit: 25 : 0}}</b></h2>
-	      	<span class="badge badge-balanced" ng-hide="user.favorBalance==0">{{user.favorBalance}}</span> 
-			<ion-option-button class="button-positive" ng-click="ownFavor(user)">
+
+			<ion-option-button class="button-positive" ng-click="openUser(user)">
 	          <i class="icon ion-ios-plus"></i>
 		    </ion-option-button>
 		</ion-item>
