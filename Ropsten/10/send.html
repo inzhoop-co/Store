@@ -1,0 +1,29 @@
+<ion-modal-view>
+    <ion-header-bar class="bar-royal">
+        <button  class="button button-clear" ng-click="closerUserPage()">
+            <i class="icon ion-ios-close"></i>
+        </button>
+        <div class="card">
+            Your Favor Token balance is {{getMyFavorBalance()}}.</b>
+        </div>
+    </ion-header-bar>
+    <ion-content class="has-header" padding="'true'">
+        <div class="item">
+            <div class="item item-input item-stacked-label item-icon-right">
+                <span class="input-label">
+                    <label class="item-floating-label">Send Favor Token To</label>
+                    <label class="item-floating-label">Contact: {{currentContact.name | strLimit: 15 : 3}}</label>
+                    <label class="item-floating-label">Address: {{currentContact.addr | strLimit: 15 : 3}}</label>
+                </span>
+            </div>
+            <div class="item item-select">
+                <span class="input-label">
+                    <label class="item-floating-label">Select favor</label>
+                    <select id="favor" class="item-select padding" ng-model="selectedFavor">
+    				    <option ng-repeat="fav in favorNames" value="{{favorNames[$index]}}" ng-selected="$index==0">{{favorNames[$index]}}</option>
+    			    </select>
+                </span>
+            </div>
+        </div>
+    </ion-content>
+</ion-modal-view>

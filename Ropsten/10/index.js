@@ -5,12 +5,14 @@ var dappleth = (function(){
 	var favorToken;
     var modalUserPage;
     var friendAddressMap;
+    var friendList;
     var pendingTransactions;
     var receivedFavorEventTopic = "0xc660321bab577202f59dc91e94b154d169f03907e4bfa02a26d0dcdbcc0e0486";
     var addedFriendEventTopic = "0x0fbde3291bf3d63d0e6eb1ab37390f2d27b3eb91810b3274a9e7e2ea86272094";
     var requestedConfirmationEventTopic = "0x4f7b02ae16f4fbd991a7af310bb7a5f4d634d4657bea9833be197529ecdda3eb";
     var filterPrefix = "0x000000000000000000000000";
-    var favorNames = {};
+    var favorNames = [];
+    var selectedFavor = "";
 	//init internal methods
 	var _init = function(core) {
 		//use menmonic $scope variable for core functions and scope
@@ -27,6 +29,10 @@ var dappleth = (function(){
         friendAddressMap = {};
         pendingTransactions = $service.getKey(Dapp.GUID,'pendingTransactions');
         favorNames = $service.getKey(Dapp.GUID,'favorNames');
+        if(!favorNames) {
+            favorNames = [];
+		}
+        friendList = [];
 		//extend angular core scope with the scope of this Dapps		
 		angular.extend($scope, context);
         $scope.getFavorNames();
@@ -56,23 +62,19 @@ var dappleth = (function(){
 		close: function(){
 			$service.exit();
 		},
-		favorFriends: function(){
-			//friend's list + flavor balance
-			var list = [];
-			$scope.friends.forEach(function(usr) {
-                friendAddressMap[usr.addr] = {score:0,confirmations:{},name:usr.name, icon:usr.icon};
-				usr.favorBalance = $scope.getFavorBalance(usr.addr);
-				list.push(usr);
-			});
-
-			var favList = dappContract.getUserFavors();
-			console.log(favList);
-
-			return list;
+		getFriends: function(){
+			if(!friendList || friendList.length == 0) {
+                $scope.friends.forEach(function(usr) {
+                    var frObj = {score:0,confirmations:{},name:usr.name, icon:usr.icon, addr:usr.addr};
+                    friendAddressMap[usr.addr] = frObj;
+                    friendList.push(frObj);
+                });
+            }
+            return friendList;
 		},
 		//basic void sample function
-		getFavorBalance: function(addr){
-			var bal = favorToken.balanceOf(addr).toNumber();
+		getMyFavorBalance: function(addr){
+			var bal = favorToken.balanceOf($service.address()).toNumber();
 			return bal;
 		},
 		ownFavor: function(user){
@@ -86,15 +88,17 @@ var dappleth = (function(){
          * @returns {Promise<never>|Promise<T>}
          */
         getRequestedConfirmations: function(friendAddress, favorName, cb) {
-            dappContract.getRequestedConfirmations(friendAddress, this.myAddress, web3.fromAscii(favorName)).then(
-            	function(result) {
-                    var requested = result[0].toNumber();
-                    console.log("Found that I need to confirm",requested,"favors for", favorName);
-                    cb(null, requested);
-                }).catch(function(error) {
-                    console.log(error);
-                	cb(error, 0);
-				});
+            dappContract.getRequestedConfirmations(friendAddress, $service.address(), web3.fromAscii(favorName),
+            	function(error, result) {
+                    if(error) {
+                        console.log(error);
+                        cb(error, 0);
+                    } else {
+                        var requested = result.toNumber();
+                        console.log("Found that I need to confirm",requested,"favors for", favorName);
+                        cb(null, requested);
+                    }
+                });
 		},
         updatePendingTransactions: function(cb) {
 			var context = this;
@@ -166,21 +170,32 @@ var dappleth = (function(){
             	}
         	});
     	},
+        receiveFavor: function() {
+
+        },
+        giveFavor: function() {
+
+        },
         getFavorNames: function() {
             $service.loadingOn();
             dappContract.getUserFavors(
             	function(error, result) {
-                	console.log("Found favor names " + JSON.stringify(result))
-            		if(result && result["0"] && result["0"] instanceof Array) {
-                		for(var i = 0; i < result["0"].length; i++) {
-                    		var favorName = web3.toAscii(result["0"][i]).replace(/\0/g, '');
-                    		if(favorNames.indexOf(favorName) < 0) {
-                        		favorNames.push(favorName);
-                        		console.log("Added favor name ",favorName);
-                    		}
-                		}
-            		}
-                    $service.loadingOff();
+                    if(error) {
+                        console.log("Failed to find user's favor names", error)
+                        $service.loadingOff();
+                    } else {
+                        console.log("Found favor names " + JSON.stringify(result))
+                        if(result && result instanceof Array) {
+                            for(var i = 0; i < result.length; i++) {
+                                var favorName = web3.toAscii(result[i]).replace(/\0/g, '');
+                                if(favorNames.indexOf(favorName) < 0) {
+                                    favorNames.push(favorName);
+                                    console.log("Added favor name ",favorName);
+                                }
+                            }
+                        }
+                        $service.loadingOff();
+					}
         		});
     	},
 		/**
@@ -203,15 +218,15 @@ var dappleth = (function(){
             			if(error) {
             				console.log("Failed to get received favors", error)
 						} else {
-                            console.log("Received", result[0].toNumber(), "favors from ", friendAddress, "for", favorName, "on", Dapp.Contracts[0].Address);
-                            var receivedFavors = result[0].toNumber();
+                            console.log("Received", result.toNumber(), "favors from ", friendAddress, "for", favorName, "on", Dapp.Contracts[0].Address);
+                            var receivedFavors = result.toNumber();
                             dappContract.getPerformedFavors(friendAddress, $service.address(), web3.fromAscii(favorName),
                                 function (error, result) {
                                     if (error) {
                                         console.log("Failed to get given favors", error)
                                     } else {
-                                        console.log("Given", result[0].toNumber(), "favors to ", friendAddress, "for", favorName, "on", Dapp.Contracts[0].Address);
-                                        var givenFavors = result[0].toNumber();
+                                        console.log("Given", result.toNumber(), "favors to ", friendAddress, "for", favorName, "on", Dapp.Contracts[0].Address);
+                                        var givenFavors = result.toNumber();
                                         $scope.getRequestedConfirmations(friendAddress, favorName,
                                             function (error, requestedConfirmations) {
                                                 if (error) {
@@ -262,21 +277,47 @@ var dappleth = (function(){
                     cb(null);
                 }
         },
+        openSendTokenDialog: function(user) {
+			try {
+				modalUserPage = $service.pageModal();
+				$scope.favorNames = favorNames;
+				$scope.currentContact = friendAddressMap[user.addr];
+				modalUserPage.fromTemplateUrl(Dapp.Path + 'send.html', {
+					scope: $scope,
+					animation: 'slide-in-up'
+				}).then(function (modal) {
+					modalUserPage = modal;
+					modalUserPage.show();
+					console.log('opened send.html');
+				});
+			} catch (err) {
+				$service.popupAlert("Error", "Something failed " + err);
+			}
+		},
 		openUser: function(user) {
+            $service.loadingOn();
             $scope.getScoresForOneFriend(user.addr, favorNames, 0, function(err) {
+                $service.loadingOff();
             	if(err) {
-                    popupAlert("error", err);
+                    $service.popupAlert("error", err);
 				} else {
-                    modalUserPage = $service.pageModal();
-                    $scope.currentContact = friendAddressMap[user.addr];
-                    modalUserPage.fromTemplateUrl(Dapp.Path + 'user.html', {
-                        scope: $scope,
-                        animation: 'slide-in-up'
-                    }).then(function (modal) {
-                        modalUserPage = modal;
-                        modalUserPage.show();
-                        console.log('modal opened!');
-                    });
+            	    try {
+                        modalUserPage = $service.pageModal();
+                        $scope.favorNames = favorNames;
+                        $scope.currentContact = friendAddressMap[user.addr];
+                        $scope.selectedFavor = favorNames[0];
+                        modalUserPage.fromTemplateUrl(Dapp.Path + 'user.html', {
+                            scope: $scope,
+                            animation: 'slide-in-up'
+                        }).then(function (modal) {
+                            modalUserPage = modal;
+                            modalUserPage.show();
+                            console.log('opened user.html');
+                        });
+                    } catch (err) {
+                        $service.popupAlert("Error", "Something failed " + err);
+                    }
+
 				}
 
             });

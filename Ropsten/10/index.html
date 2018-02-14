@@ -40,17 +40,23 @@
 -->
 
 	<div class="card item-avatar-left">
-		<h3>Favor Token</h3>
+		<h2>Favor Token</h2>
+		You have: {{getMyFavorBalance()}} Favor Tokens
 	</div>
-
+<div class="card">
+	When someone does you a favor, send them a Favor Token. <b>Swipe left over contact to see options or tap contact to see favors.</b>
+</div>
 	<ion-list class="list">
-		<ion-item class="item item-avatar" ng-repeat="user in favorFriends() | filter:search track by $index">
+		<ion-item class="item item-avatar item-icon-right" ng-repeat="user in getFriends() | filter:search track by $index" ng-click="openUser(user)">
 			<img ng-src="{{user.icon}}"/>
 			<h2><b>{{user.name | strLimit: 25 : 0}}</b></h2>
-
+			<i class="icon ion-chevron-right icon-accessory"></i>
 			<ion-option-button class="button-positive" ng-click="openUser(user)">
-	          <i class="icon ion-ios-plus"></i>
-		    </ion-option-button>
+				See favors
+			</ion-option-button>
+			<ion-option-button class="button-positive" ng-click="openSendTokenDialog(user)">
+				Send token
+			</ion-option-button>
 		</ion-item>
 	</ion-list>
 
