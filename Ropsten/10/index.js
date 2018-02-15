@@ -6,13 +6,15 @@ var dappleth = (function(){
     var modalUserPage;
     var friendAddressMap;
     var friendList;
-    var pendingTransactions;
+    var pendingTransactions; //pending transactions of received favors
     var receivedFavorEventTopic = "0xc660321bab577202f59dc91e94b154d169f03907e4bfa02a26d0dcdbcc0e0486";
     var addedFriendEventTopic = "0x0fbde3291bf3d63d0e6eb1ab37390f2d27b3eb91810b3274a9e7e2ea86272094";
     var requestedConfirmationEventTopic = "0x4f7b02ae16f4fbd991a7af310bb7a5f4d634d4657bea9833be197529ecdda3eb";
     var filterPrefix = "0x000000000000000000000000";
     var favorNames = [];
     var selectedFavor = "";
+    var tips = ["Swipe left over a contact to see options or tap contact to see favors.","When someone does you a favor, send them a Favor Token.","We have added a couple of common favors for you: 'Paid for coffee' and 'Just a favor', so you can get started."];
+    var currentTip = 0;
 	//init internal methods
 	var _init = function(core) {
 		//use menmonic $scope variable for core functions and scope
@@ -30,9 +32,13 @@ var dappleth = (function(){
         pendingTransactions = $service.getKey(Dapp.GUID,'pendingTransactions');
         favorNames = $service.getKey(Dapp.GUID,'favorNames');
         if(!favorNames) {
-            favorNames = [];
+            favorNames = ["Just a favor", "Paid for coffee"];
 		}
         friendList = [];
+        currentTip = $service.getKey(Dapp.GUID,'currentTip');
+        if(!currentTip) {
+            currentTip = 0;
+        }
 		//extend angular core scope with the scope of this Dapps		
 		angular.extend($scope, context);
         $scope.getFavorNames();
@@ -65,21 +71,25 @@ var dappleth = (function(){
 		getFriends: function(){
 			if(!friendList || friendList.length == 0) {
                 $scope.friends.forEach(function(usr) {
-                    var frObj = {score:0,confirmations:{},name:usr.name, icon:usr.icon, addr:usr.addr};
+                    var frObj = {me:0, them:0, confirmations:{},name:usr.name, icon:usr.icon, addr:usr.addr};
                     friendAddressMap[usr.addr] = frObj;
                     friendList.push(frObj);
                 });
             }
             return friendList;
 		},
-		//basic void sample function
+        nextTip: function() {
+            currentTip++;
+            currentTip = currentTip % tips.length;
+            $service.storeData(Dapp.GUID, "currentTip", currentTip);
+
+        },
+        getCurrentTip: function() {
+		  return tips[currentTip];
+        },
 		getMyFavorBalance: function(addr){
 			var bal = favorToken.balanceOf($service.address()).toNumber();
 			return bal;
-		},
-		ownFavor: function(user){
-			//dappContract.addFriend(user.addr, user.name);
-			$service.popupAlert('OWN YOU FAVOR',"to do...");
 		},
         /**
          * fetch number of favors that I need to confirm for this favorName from friendAddress
@@ -173,9 +183,6 @@ var dappleth = (function(){
         receiveFavor: function() {
 
         },
-        giveFavor: function() {
-
-        },
         getFavorNames: function() {
             $service.loadingOn();
             dappContract.getUserFavors(
@@ -218,15 +225,15 @@ var dappleth = (function(){
             			if(error) {
             				console.log("Failed to get received favors", error)
 						} else {
-                            console.log("Received", result.toNumber(), "favors from ", friendAddress, "for", favorName, "on", Dapp.Contracts[0].Address);
-                            var receivedFavors = result.toNumber();
+                            var toMe = result.toNumber();
+                            console.log("I received", toMe, "favors from ", friendAddress, "for", favorName, "on", Dapp.Contracts[0].Address);
                             dappContract.getPerformedFavors(friendAddress, $service.address(), web3.fromAscii(favorName),
                                 function (error, result) {
                                     if (error) {
                                         console.log("Failed to get given favors", error)
                                     } else {
-                                        console.log("Given", result.toNumber(), "favors to ", friendAddress, "for", favorName, "on", Dapp.Contracts[0].Address);
-                                        var givenFavors = result.toNumber();
+                                        var fromMe = result.toNumber();
+                                        console.log("I gave", fromMe, "favors to ", friendAddress, "for", favorName, "on", Dapp.Contracts[0].Address);
                                         $scope.getRequestedConfirmations(friendAddress, favorName,
                                             function (error, requestedConfirmations) {
                                                 if (error) {
@@ -235,20 +242,24 @@ var dappleth = (function(){
                                                     if (friendAddressMap) {
                                                         var fObj = friendAddressMap[friendAddress];
                                                         if (fObj) {
-                                                            if (!fObj.scores) {
-                                                                fObj.scores = {};
+                                                            if (!fObj.them) {
+                                                                fObj.them = {};
                                                             }
-                                                            fObj.scores[favorName] = givenFavors - receivedFavors;
+                                                            if (!fObj.me) {
+                                                                fObj.me = {};
+                                                            }
+                                                            fObj.them[favorName] = toMe;
+                                                            fObj.me[favorName] = fromMe;
                                                             fObj.confirmations[favorName] = requestedConfirmations;
-                                                            console.log("Set friend's score for", favorName, "to", fObj.scores[favorName]);
+                                                            console.log("Set friend's score for", favorName, "to me:", fObj.me[favorName], " x them:", fObj.them[favorName]);
                                                             if (pendingTransactions) {
                                                                 for (var k in pendingTransactions) {
                                                                     var v = pendingTransactions[k];
                                                                     if (v == friendAddress) {
-                                                                        var score = fObj.scores[favorName] - 1;
-                                                                        fObj.scores[favorName] = score;
+                                                                        var score = fObj.them[favorName] + 1;
+                                                                        fObj.them[favorName] = score;
                                                                         friendAddressMap[friendAddress] = fObj;
-                                                                        console.log("Updated friend's score for", favorName, "to", fObj.scores[favorName]);
+                                                                        console.log("Updated friend's score for", favorName, "to", fObj.them[favorName]);
                                                                     }
                                                                 }
                                                             }
@@ -282,6 +293,7 @@ var dappleth = (function(){
 				modalUserPage = $service.pageModal();
 				$scope.favorNames = favorNames;
 				$scope.currentContact = friendAddressMap[user.addr];
+             //   $service.closeOptionButtons();
 				modalUserPage.fromTemplateUrl(Dapp.Path + 'send.html', {
 					scope: $scope,
 					animation: 'slide-in-up'
@@ -298,6 +310,7 @@ var dappleth = (function(){
             $service.loadingOn();
             $scope.getScoresForOneFriend(user.addr, favorNames, 0, function(err) {
                 $service.loadingOff();
+                //$service.closeOptionButtons();
             	if(err) {
                     $service.popupAlert("error", err);
 				} else {

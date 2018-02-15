@@ -8,12 +8,9 @@
     <ion-content class="has-header" padding="'true'">
         <ion-list class="list">
             <ion-item class="item" ng-repeat="favor in favorNames track by $index">
-                <h2>{{favor}}</h2>
-                <ion-option-button class="button-positive" ng-click="giveFavor()">
-                    Me:&nbsp;&nbsp;<ion-icon class="icon ion-ios-plus"></ion-icon>
-                </ion-option-button>
+                <h2><i>{{favor | strLimit: 16 : 3}}</i>. Me: <b>{{currentContact.me[favor]}}</b> {{currentContact.name | strLimit: 10 : 3}}: <b>{{currentContact.them[favor]}}</b></h2>
                 <ion-option-button class="button-positive" ng-click="receiveFavor()">
-                    {{currentContact.name}}:&nbsp;&nbsp;<ion-icon class="icon ion-ios-plus"></ion-icon>
+                    Send Favor Token<ion-icon class="icon ion-paper-airplane"></ion-icon>
                 </ion-option-button>
             </ion-item>
         </ion-list>
