@@ -1,0 +1,16 @@
+<ion-modal-view>
+    <ion-header-bar class="bar-royal">
+        <button  class="button button-clear" ng-click="closeBuyDialog()">
+            <i class="icon ion-ios-close"></i>
+        </button>
+        <div class="h1 title">
+            You have <b>{{getMyFavorBalance()}}</b> Favor Tokens
+        </div>
+    </ion-header-bar>
+    <ion-content class="has-header" padding="'true'">
+        <div class="item item-text-wrap item-icon-left">
+            <i class="icon ion-information-circled"></i>
+            Current price of Favor Token is {{currentPrice}} ETH
+        </div>
+    </ion-content>
+</ion-modal-view>

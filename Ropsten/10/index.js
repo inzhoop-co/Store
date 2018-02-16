@@ -13,6 +13,7 @@ var dappleth = (function(){
     var filterPrefix = "0x000000000000000000000000";
     var favorNames = [];
     var blockChainFavors = [];
+    var currentPrice = 0;
     var tips = [
         "Swipe left over a contact to see options or tap contact to see favors.",
         "When someone does you a favor, send them a Favor Token."
@@ -34,6 +35,7 @@ var dappleth = (function(){
         friendAddressMap = {};
         pendingTransactions = $service.getKey(Dapp.GUID,'pendingTransactions');
         context.getFavorNames();
+        context.getFavorPrice();
         favorNames = $service.getKey(Dapp.GUID,'favorNames');
         if(!favorNames) {
             favorNames = ["Just a favor", "Paid for coffee"];
@@ -56,7 +58,7 @@ var dappleth = (function(){
         }
 		//extend angular core scope with the scope of this Dapps		
 		angular.extend($scope, context);
-	}
+	};
 
 
 
@@ -105,6 +107,18 @@ var dappleth = (function(){
 			var bal = favorToken.balanceOf($service.address()).toNumber();
 			return bal;
 		},
+        getFavorPrice: function(cb) {
+		  var price = dappContract.price(function(error, result) {
+		      if(error) {
+                  $service.popupAlert("Error", "Failed to get current price for Favor Token " + error);
+              } else {
+                  currentPrice = web3.fromWei(result.toNumber(),'ether');
+              }
+              if(cb) {
+		          cb(error, currentPrice);
+              }
+          });
+        },
         /**
          * fetch number of favors that I need to confirm for this favorName from friendAddress
          * @param friendAddress
@@ -141,7 +155,16 @@ var dappleth = (function(){
                         console.log("Found",numEvents,"given favor transactions")
                         for (var i = 0; i < numEvents; i++) {
                             var txHash = events[i].transactionHash;
-                            console.log("Hash of given favor TX ", txHash);
+                            if(events[i].topics && events[i].topics[3]) {
+                                var favorName = web3.toAscii(events[i].topics[3]).replace(/\0/g, '');
+                                if(favorNames.indexOf(favorName) < 0) {
+                                    favorNames.push(favorName);
+                                    console.log("Added favor name ",favorName);
+                                    $service.storeData(Dapp.GUID, "favorNames", favorNames);
+                                }
+                                blockChainFavors.push(favorName);
+                            }
+                            //console.log("Hash of given favor TX ", txHash);
                             $scope.markTransactionComplete(txHash);
                         }
                         web3.eth.filter({
@@ -157,7 +180,17 @@ var dappleth = (function(){
                                 console.log("Found",numEvents,"received favor transactions");
                                 for (var i = 0; i < numEvents; i++) {
                                     var txHash = events[i].transactionHash;
-                                    console.log("Hash of received favor TX ", txHash);
+                                    if(events[i].topics && events[i].topics[3]) {
+                                        var favorName = web3.toAscii(events[i].topics[3]).replace(/\0/g, '');
+                                        if(favorNames.indexOf(favorName) < 0) {
+                                            favorNames.push(favorName);
+                                            console.log("Added favor name ",favorName);
+                                            $service.storeData(Dapp.GUID, "favorNames", favorNames);
+                                        }
+                                        blockChainFavors.push(favorName);
+                                    }
+                                    //console.log("Hash of received favor TX ", txHash);
+                                    //console.log("Transaction details",JSON.stringify(events[i]));
                                     $scope.markTransactionComplete(txHash);
                                 }
                                 console.log("Finished loading transactions");
@@ -250,7 +283,8 @@ var dappleth = (function(){
                     });
             }
         },
-        deleteFavorName: function(favorName) {
+        deleteFavorName: function(favorName, ctx) {
+            $service.loadingOn();
             console.log("Deleting favor", favorName);
             var cleanFavorNames = [];
             for(var i in favorNames) {
@@ -261,8 +295,10 @@ var dappleth = (function(){
             favorNames = cleanFavorNames;
             this.favorNames = favorNames;
             $service.storeData(Dapp.GUID, "favorNames", favorNames);
+            $service.closeOptionButtons();
             this.closeFavorsDialog();
             this.openFavorsDialog();
+            $service.loadingOff();
         },
         addNewFavorName: function() {
             console.log("Adding new favor", this.newFavorName);
@@ -392,7 +428,7 @@ var dappleth = (function(){
 				$scope.favorNames = favorNames;
 				$scope.currentContact = friendAddressMap[user.addr];
                 $scope.selectedFavor = favorNames[0];
-             //   $service.closeOptionButtons();
+                $service.closeOptionButtons();
                 modalPage.fromTemplateUrl(Dapp.Path + 'send.html', {
 					scope: $scope,
 					animation: 'slide-in-up'
@@ -409,7 +445,7 @@ var dappleth = (function(){
             $service.loadingOn();
             $scope.getScoresForOneFriend(user.addr, favorNames, 0, function(err) {
                 $service.loadingOff();
-                //$service.closeOptionButtons();
+                $service.closeOptionButtons();
             	if(err) {
                     $service.popupAlert("error", err);
 				} else {
@@ -429,9 +465,7 @@ var dappleth = (function(){
                     } catch (err) {
                         $service.popupAlert("Error", "Something failed " + err);
                     }
-
 				}
-
             });
 		},
         openFavorsDialog: function() {
@@ -440,7 +474,7 @@ var dappleth = (function(){
                 $scope.favorNames = favorNames;
                 $scope.newFavorName = "";
                 $scope.blockChainFavors = blockChainFavors;
-                //   $service.closeOptionButtons();
+                $service.closeOptionButtons();
                 modalPage.fromTemplateUrl(Dapp.Path + 'favors.html', {
                     scope: $scope,
                     animation: 'slide-in-up'
@@ -454,7 +488,25 @@ var dappleth = (function(){
             }
         },
         openBuyDialog: function() {
-
+            $service.loadingOn();
+            $scope.getFavorPrice(function(err, price) {
+                $service.loadingOff();
+                $service.closeOptionButtons();
+                try {
+                    modalPage = $service.pageModal();
+                    $scope.currentPrice = price;
+                    modalPage.fromTemplateUrl(Dapp.Path + 'buy.html', {
+                        scope: $scope,
+                        animation: 'slide-in-up'
+                    }).then(function (modal) {
+                        modalPage = modal;
+                        modalPage.show();
+                        console.log('opened buy.html');
+                    });
+                } catch (err) {
+                    $service.popupAlert("Error", "Something failed " + err);
+                }
+            })
         },
         closeBuyDialog: function(){
             modalPage.hide();
