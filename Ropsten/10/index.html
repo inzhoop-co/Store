@@ -23,13 +23,14 @@
 		You can otherwise write your own html and css in this content page
 -->
 <div class="card">
-    <div class="item item-divider">
-        <button class="button button-small icon-left ion-checkmark-circled" ng-click="nextTip()">Got it!</button>
-    </div>
     <div class="item item-text-wrap item-icon-left">
         <i class="icon ion-information-circled"></i>
         <p>{{getCurrentTip()}}</p>
     </div>
+    <div class="item item-divider">
+        <button class="button button-small icon-right ion-arrow-right-b" ng-click="nextTip()">Next tip</button>
+    </div>
+
 </div>
     <div class="card">
         <div class="item item-text-wrap">
@@ -38,18 +39,18 @@
 
     <div class="button-bar">
         <button class="button icon-left ion-ios-cart" ng-click="openBuyDialog()" style="overflow:visible; padding: 0 10px">Buy tokens</button>
-        <button class="button icon-left ion-ios-cog" ng-click="openBuyDialog()" style="overflow:visible; padding: 0 10px">Manage favors</button>
+        <button class="button icon-left ion-ios-cog" ng-click="openFavorsDialog()" style="overflow:visible; padding: 0 10px">Manage favors</button>
     </div>
     </div>
 	<ion-list class="list">
-		<ion-item class="item item-avatar item-icon-right" ng-repeat="user in getFriends() | filter:search track by $index" ng-click="openUser(user)">
+		<ion-item class="item item-avatar item-icon-right" ng-repeat="user in getFriends() | filter:search track by $index" ng-click="openUserDialog(user)">
 			<img ng-src="{{user.icon}}"/>
 			<h2><b>{{user.name | strLimit: 25 : 0}}</b></h2>
 			<i class="icon ion-chevron-right icon-accessory"></i>
-			<ion-option-button class="button-positive" ng-click="openUser(user)">
+			<ion-option-button class="button-positive icon-left ion-beer" ng-click="openUserDialog(user)">
 				See favors
 			</ion-option-button>
-			<ion-option-button class="button-positive" ng-click="openSendTokenDialog(user)">
+			<ion-option-button class="button-positive ion-paper-airplane icon-left" ng-click="openSendDialog(user)">
 				Send token
 			</ion-option-button>
 		</ion-item>

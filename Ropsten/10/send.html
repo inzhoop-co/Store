@@ -1,17 +1,17 @@
 <ion-modal-view>
     <ion-header-bar class="bar-royal">
-        <button  class="button button-clear" ng-click="closerUserPage()">
+        <button  class="button button-clear" ng-click="closeSendDialog()">
             <i class="icon ion-ios-close"></i>
         </button>
-        <div class="card">
-            Your Favor Token balance is {{getMyFavorBalance()}}.</b>
+        <div class="h1 title">
+            You have <b>{{getMyFavorBalance()}}</b> Favor Tokens
         </div>
     </ion-header-bar>
     <ion-content class="has-header" padding="'true'">
         <div class="item">
             <div class="item item-input item-stacked-label item-icon-right">
                 <span class="input-label">
-                    <label class="item-floating-label">Send Favor Token To</label>
+                    <label class="item-floating-label">Send <b>1</b> Favor Token To</label>
                     <label class="item-floating-label">Contact: {{currentContact.name | strLimit: 15 : 3}}</label>
                     <label class="item-floating-label">Address: {{currentContact.addr | strLimit: 15 : 3}}</label>
                 </span>
@@ -24,8 +24,7 @@
     			    </select>
                 </span>
             </div>
-            <button class="button button-block button-energized" ng-click="sendToken()"><i class="icon ion-paper-airplane"></i> Send
-            </button>
+            <button class="button button-block button-energized" ng-click="sendToken()"><i class="icon ion-paper-airplane"></i> Send</button>
         </div>
     </ion-content>
 </ion-modal-view>

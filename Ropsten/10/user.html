@@ -1,6 +1,6 @@
 <ion-modal-view>
     <ion-header-bar class="bar-royal">
-        <button  class="button button-clear" ng-click="closerUserPage()">
+        <button  class="button button-clear" ng-click="closeUserDialog()">
             <i class="icon ion-ios-close"></i>
         </button>
         <div class="h1 title">Favors</div>
@@ -9,8 +9,8 @@
         <ion-list class="list">
             <ion-item class="item" ng-repeat="favor in favorNames track by $index">
                 <h2><i>{{favor | strLimit: 16 : 3}}</i>. Me: <b>{{currentContact.me[favor]}}</b> {{currentContact.name | strLimit: 10 : 3}}: <b>{{currentContact.them[favor]}}</b></h2>
-                <ion-option-button class="button-positive" ng-click="receiveFavor()">
-                    Send Favor Token<ion-icon class="icon ion-paper-airplane"></ion-icon>
+                <ion-option-button class="button-positive ion-paper-airplane icon-left" ng-click="receiveFavor()">
+                    Send Token
                 </ion-option-button>
             </ion-item>
         </ion-list>

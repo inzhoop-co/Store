@@ -1,0 +1,28 @@
+<ion-modal-view>
+    <ion-header-bar class="bar-royal">
+        <button  class="button button-clear" ng-click="closeFavorsDialog()">
+            <i class="icon ion-ios-close"></i>
+        </button>
+        <div class="h1 title">Manage Tracked Favors</div>
+    </ion-header-bar>
+    <ion-content class="has-header" padding="'true'">
+        <div class="item item-text-wrap item-icon-left">
+            <i class="icon ion-information-circled"></i>
+            <p>Here you can add new types of favors to track with Favor Tokens. Just type in the name of the new favor and tap "Add" button.</p>
+        </div>
+        <div class="card">
+            <label class="item item-input">
+                <input type="text" id="iNewFavorName" placeholder="Name of the favor" ng-model="newFavorName">
+            </label>
+            <button class="button button-block button-energized" ng-click="addNewFavorName(modal)"><i class="icon ion-ios-plus-outline"></i> Add</button>
+        </div>
+        <ion-list class="list">
+            <ion-item class="item" ng-repeat="favor in favorNames track by $index">
+                <h2><i>{{favor | strLimit: 32 : 3}}</i></b></h2>
+                <ion-option-button class="button-positive icon-left ion-trash-a" ng-click="deleteFavorName(favor)" ng-hide="blockChainFavors.indexOf(favor) > -1">
+                    Delete
+                </ion-option-button>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-modal-view>
