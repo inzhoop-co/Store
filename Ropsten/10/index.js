@@ -13,7 +13,8 @@ var dappleth = (function(){
     var filterPrefix = "0x000000000000000000000000";
     var favorNames = [];
     var blockChainFavors = [];
-    var currentPrice = 0;
+    var currentPriceWei = 0;
+    var currentPriceEth = 0;
     var tips = [
         "Swipe left over a contact to see options or tap contact to see favors.",
         "When someone does you a favor, send them a Favor Token."
@@ -112,10 +113,11 @@ var dappleth = (function(){
 		      if(error) {
                   $service.popupAlert("Error", "Failed to get current price for Favor Token " + error);
               } else {
-                  currentPrice = web3.fromWei(result.toNumber(),'ether');
+		          currentPriceWei = result.toNumber();
+                  currentPriceEth = web3.fromWei(result.toNumber(),'ether');
               }
               if(cb) {
-		          cb(error, currentPrice);
+		          cb(error, currentPriceEth);
               }
           });
         },
@@ -232,6 +234,43 @@ var dappleth = (function(){
             	}
         	});
     	},
+        buyTokens:function () {
+            console.log("tapped buy tokens ",this.howMany,"at",currentPriceWei,"wei (",currentPriceEth," ETH)");
+            var gasLimit = 3000000;
+            var gasPrice = web3.eth.gasPrice;
+            //var value = web3.toWei(currentPrice * this.howMany, 'ether');
+            var value = currentPriceWei * this.howMany;
+            var params = [$service.address()];
+            console.log("Sending ",value,"to Turnsy");
+            /*dappContract.buyTokens($service.address(), {'value':value, 'gas': gasLimit, 'gasPrice' : gasPrice}, function(error, txHash) {
+                if(error) {
+                    console.log("Error", error);
+                }
+                if(txHash) {
+                    console.log("transaction hash", txHash);
+                } else {
+                    console.log("Error: empty transaction hash");
+                }
+            });*/
+            $service.transactionCall(dappContract, "buyTokens", params, value, gasLimit, gasPrice).then(
+                function(txHash) {
+                    if(!txHash) {
+                        console.log("Error: empty transaction hash");
+                    } else if(txHash instanceof Array && txHash[0]) {
+                        console.log("Error", txHash[0]);
+                        $service.popupAlert("Error", txHash[0]);
+                    } else {
+                        console.log("transaction hash", txHash);
+                    }
+                },
+                function(error) {
+                    if(error) {
+                        console.log("Error", error);
+                        $service.popupAlert("Error", error);
+                    }
+                }
+            );
+        },
         receiveFavor: function() {
 
         },
@@ -275,7 +314,6 @@ var dappleth = (function(){
                                 ctx.pendingTransactions = {};
                             }
                             ctx.pendingTransactions[txHash] = ctx.currentContact.addr;
-                            console.log("Transaction hash",txHash);
                             $service.storeData(Dapp.GUID, "pendingTransactions", pendingTransactions);
                         } else {
                             console.log("Error: empty transaction hash");
@@ -489,12 +527,12 @@ var dappleth = (function(){
         },
         openBuyDialog: function() {
             $service.loadingOn();
-            $scope.getFavorPrice(function(err, price) {
+            $scope.getFavorPrice(function(err, priceEth) {
                 $service.loadingOff();
                 $service.closeOptionButtons();
                 try {
                     modalPage = $service.pageModal();
-                    $scope.currentPrice = price;
+                    $scope.currentPriceEth = priceEth;
                     modalPage.fromTemplateUrl(Dapp.Path + 'buy.html', {
                         scope: $scope,
                         animation: 'slide-in-up'
