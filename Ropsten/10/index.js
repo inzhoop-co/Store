@@ -74,7 +74,6 @@ var dappleth = (function(){
 	var context = {
 		//generic function called on refresh
 		dappRefresh: function(value){
-			//...
 			$scope.$broadcast('scroll.refreshComplete');
 		},
 		//sample API call to get your balance from UI
@@ -239,7 +238,8 @@ var dappleth = (function(){
             var gasLimit = 3000000;
             var gasPrice = web3.eth.gasPrice;
             //var value = web3.toWei(currentPrice * this.howMany, 'ether');
-            var value = currentPriceWei * this.howMany;
+            var amount = this.howMany;
+            var value = currentPriceWei * amount;
             var params = [$service.address()];
             console.log("Sending ",value,"to Turnsy");
             /*dappContract.buyTokens($service.address(), {'value':value, 'gas': gasLimit, 'gasPrice' : gasPrice}, function(error, txHash) {
@@ -256,14 +256,20 @@ var dappleth = (function(){
                 function(txHash) {
                     if(!txHash) {
                         console.log("Error: empty transaction hash");
+                        $service.popupAlert("Error", "Transaction failed");
                     } else if(txHash instanceof Array && txHash[0]) {
                         console.log("Error", txHash[0]);
                         $service.popupAlert("Error", txHash[0]);
+                    } else if(txHash instanceof Array && txHash[1]) {
+                        console.log("transaction hash", txHash[1]);
+                        $service.popupAlert("Success", "You purchased " + amount + " Favor Tokens. Your balance may take a minute to update.");
                     } else {
+                        $service.popupAlert("Error", "Transaction failed" + txHash);
                         console.log("transaction hash", txHash);
                     }
                 },
                 function(error) {
+                    $service.loadingOff();
                     if(error) {
                         console.log("Error", error);
                         $service.popupAlert("Error", error);
@@ -271,11 +277,9 @@ var dappleth = (function(){
                 }
             );
         },
-        receiveFavor: function() {
-
-        },
-        sendToken: function() {
-            console.log("tapped send token for",this.selectedFavor);
+        sendToken: function(favor) {
+            var selectedFavor = favor ? favor : this.selectedFavor;
+            console.log("tapped send token for",selectedFavor);
             if(this.getMyFavorBalance() < 1) {
                 $service.popupAlert("Error", "You do not have a token to send. You need to earn or buy a token before you can send it.");
             } else {
@@ -304,19 +308,22 @@ var dappleth = (function(){
                      }
                  );*/
                 var ctx = this;
-                dappContract.receiveFavor(this.currentContact.addr, web3.fromAscii(this.selectedFavor),1, {'gas': gasLimit, 'gasPrice' : gasPrice}, function(error, txHash) {
+                dappContract.receiveFavor(this.currentContact.addr, web3.fromAscii(selectedFavor), 1, {'from':$service.address(), 'gas': gasLimit, 'gasPrice' : gasPrice}, function(error, txHash) {
                         if(error) {
                             console.log("Error", error);
+                            $service.popupAlert("Error", "Transaction failed:" + error);
                         }
                         if(txHash) {
                             console.log("transaction hash", txHash);
-                            if(!ctx.pendingTransactions) {
-                                ctx.pendingTransactions = {};
+                            if(!pendingTransactions) {
+                                pendingTransactions = {};
                             }
-                            ctx.pendingTransactions[txHash] = ctx.currentContact.addr;
+                            pendingTransactions[txHash] = ctx.currentContact.addr;
                             $service.storeData(Dapp.GUID, "pendingTransactions", pendingTransactions);
+                            $service.popupAlert("Success", "You sent a Favor Token to " + ctx.currentContact.name + " for " + selectedFavor + ". Transaction hash:" + txHash);
                         } else {
                             console.log("Error: empty transaction hash");
+                            $service.popupAlert("Error", "Transaction failed: 'Empty transaction hash'");
                         }
                     });
             }
@@ -333,7 +340,11 @@ var dappleth = (function(){
             favorNames = cleanFavorNames;
             this.favorNames = favorNames;
             $service.storeData(Dapp.GUID, "favorNames", favorNames);
-            $service.closeOptionButtons();
+            try {
+                $service.closeOptionButtons();
+            } catch (ex) {
+                //ignore
+            }
             this.closeFavorsDialog();
             this.openFavorsDialog();
             $service.loadingOff();
@@ -354,6 +365,12 @@ var dappleth = (function(){
         },
         getFavorNames: function() {
             $service.loadingOn();
+            try {
+                console.log(dappContract.getUserFavors());
+            } catch (ex) {
+                console.log(ex);
+            }
+
             dappContract.getUserFavors(
             	function(error, result) {
                     if(error) {
@@ -466,7 +483,11 @@ var dappleth = (function(){
 				$scope.favorNames = favorNames;
 				$scope.currentContact = friendAddressMap[user.addr];
                 $scope.selectedFavor = favorNames[0];
-                $service.closeOptionButtons();
+                try {
+                    $service.closeOptionButtons();
+                } catch (ex) {
+                    //ignore
+                }
                 modalPage.fromTemplateUrl(Dapp.Path + 'send.html', {
 					scope: $scope,
 					animation: 'slide-in-up'
@@ -483,7 +504,11 @@ var dappleth = (function(){
             $service.loadingOn();
             $scope.getScoresForOneFriend(user.addr, favorNames, 0, function(err) {
                 $service.loadingOff();
-                $service.closeOptionButtons();
+                try {
+                    $service.closeOptionButtons();
+                } catch (ex) {
+                    //ignore
+                }
             	if(err) {
                     $service.popupAlert("error", err);
 				} else {
@@ -512,7 +537,11 @@ var dappleth = (function(){
                 $scope.favorNames = favorNames;
                 $scope.newFavorName = "";
                 $scope.blockChainFavors = blockChainFavors;
-                $service.closeOptionButtons();
+                try {
+                    $service.closeOptionButtons();
+                } catch (ex) {
+                    //ignore
+                }
                 modalPage.fromTemplateUrl(Dapp.Path + 'favors.html', {
                     scope: $scope,
                     animation: 'slide-in-up'
@@ -529,7 +558,12 @@ var dappleth = (function(){
             $service.loadingOn();
             $scope.getFavorPrice(function(err, priceEth) {
                 $service.loadingOff();
-                $service.closeOptionButtons();
+                try {
+                    $service.closeOptionButtons();
+                } catch (ex) {
+                    //ignore
+                }
+
                 try {
                     modalPage = $service.pageModal();
                     $scope.currentPriceEth = priceEth;
