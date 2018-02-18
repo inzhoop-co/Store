@@ -8,23 +8,7 @@
 	Use <style> to add your custom additional css
 */
 </style>
-<dappleth-header>
-<!-- 	Header Page
-		An empty header will include a default header.
-		
-		Attributes: 
-		- styleclass
-			Use styleclass to set a custom class to header
-			i.e.: <dappleth-header styleclass="bar bar-header bar-positive">
-				to set a blue (positive) bar
-			(see https://ionicframework.com/docs/v1/components/ for more...)
-
-		Footer tags can be removed, mind to add some button to close Dappleth
-			i.e.:   <button class="button button-clear" on-touch="close()">
-						<i class="icon ion-ios-arrow-back dark"></i>
-					</button>
--->
-</dappleth-header>
+<dappleth-header></dappleth-header>
 <dappleth-content>
 <!-- 	Content Page
 		Write your Page using all the components of Ionic 1.x
@@ -38,34 +22,39 @@
 	
 		You can otherwise write your own html and css in this content page
 -->
+<div class="card">
+    <div class="item item-text-wrap item-icon-left">
+        <i class="icon ion-information-circled"></i>
+        <p>{{getCurrentTip()}}</p>
+    </div>
+    <div class="item item-divider">
+        <button class="button button-small icon-right ion-arrow-right-b" ng-click="nextTip()">Next tip</button>
+    </div>
+</div>
+    <div class="card">
+        <div class="item item-text-wrap">
+            You have <b>{{getMyFavorBalance()}}</b> Favor Tokens
+        </div>
 
-	<div class="card item-avatar-left">
-		<h3>Favor Token</h3>
-	</div>
-
+    <div class="button-bar">
+        <button class="button icon-left ion-ios-cart" ng-click="openBuyDialog()" style="overflow:visible; padding: 0 10px">Buy tokens</button>
+        <button class="button icon-left ion-ios-cog" ng-click="openFavorsDialog()" style="overflow:visible; padding: 0 10px">Manage favors</button>
+    </div>
+    </div>
 	<ion-list class="list">
-		<ion-item class="item item-avatar" ng-repeat="user in favorFriends() | filter:search track by $index">
+		<ion-item class="item item-avatar item-icon-right" ng-repeat="user in getFriends() | filter:search track by $index" ng-click="openUserDialog(user)">
 			<img ng-src="{{user.icon}}"/>
 			<h2><b>{{user.name | strLimit: 25 : 0}}</b></h2>
-	      	<span class="badge badge-balanced" ng-hide="user.favorBalance==0">{{user.favorBalance}}</span> 
-			<ion-option-button class="button-positive" ng-click="ownFavor(user)">
-	          <i class="icon ion-ios-plus"></i>
-		    </ion-option-button>
+			<i class="icon ion-chevron-right icon-accessory"></i>
+			<ion-option-button class="button-positive icon-left ion-beer" ng-click="openUserDialog(user)">
+				See favors
+			</ion-option-button>
+			<ion-option-button class="button-positive ion-paper-airplane icon-left" ng-click="openSendDialog(user)">
+				Send token
+			</ion-option-button>
 		</ion-item>
 	</ion-list>
 
 </dappleth-content>
 <dappleth-footer>
-<!-- 	Footer Page
-		An empty footer will include a default header.
-		
-		Attributes: 
-		- styleclass
-			Use styleclass to set a custom class to header
-			i.e.: <dappleth-header styleclass="bar bar-header bar-positive">
-				to set a blue (positive) bar
-			(see https://ionicframework.com/docs/v1/components/ for more...)
-
-		Footer tags can be removed.
--->
 </dappleth-footer>

@@ -250,7 +250,7 @@
 		},
 		{
 			"GUID": "10",
-			"Name" : "Favor",
+			"Name" : "Favor Token",
 			"Company" : "grishick",
 			"Url" :{
 				"Install" : "index.html",
@@ -267,8 +267,8 @@
 				"Banner":"logo.png"
 			},
 			"Descriptions" : {
-				"Title": "Favor dappleths",
-				"Abstract": "Demo Dappleth"
+				"Title": "Favor",
+				"Abstract": "Keep track of favors that you exchange with friends"
 			}
 		}
 	],

@@ -1,0 +1,28 @@
+<ion-modal-view>
+    <ion-header-bar class="bar-royal">
+        <button  class="button button-clear" ng-click="closeBuyDialog()">
+            <i class="icon ion-ios-close"></i>
+        </button>
+        <div class="h1 title">
+            Buy more Favor Tokens
+        </div>
+    </ion-header-bar>
+    <ion-content class="has-header" padding="'true'">
+        <div class="list card">
+            <a href="#" class="item item-text-wrap item-icon-left">
+                <i class="icon ion-ios-information"></i>
+                Your ETH balance is {{myBalance()}}
+            </a>
+            <a href="#" class="item item-text-wrap item-icon-left">
+                <i class="icon ion-ios-information"></i>
+                Token price is {{currentPriceEth}} ETH
+            </a>
+        </div>
+        <div class="list">
+            <label class="item item-input">
+                <input type="text" placeholder="How many?" ng-model="howMany">
+            </label>
+            <button class="button button-block button-energized" ng-click="buyTokens()"><i class="icon ion-ios-cart"></i> Buy</button>
+        </div>
+    </ion-content>
+</ion-modal-view>
