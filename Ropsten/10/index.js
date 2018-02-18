@@ -201,6 +201,7 @@ var dappleth = (function(){
          */
         getRequestedConfirmations: function(friendAddress, favorName, cb) {
             dappContract.getRequestedConfirmations(friendAddress, $service.address(), web3.fromAscii(favorName),
+                {'from':$service.address()},
             	function(error, result) {
                     if(error) {
                         console.log(error);
@@ -351,8 +352,8 @@ var dappleth = (function(){
                 	cb(error);
             	} else {
             		console.log("Updated pending transactions");
-                    cb(null);
-                	//$scope.getScoresForOneFriendInternal(friendAddress, favorList, index, cb);
+                    //cb(null);
+                	$scope.getScoresForOneFriendInternal(friendAddress, favorList, index, cb);
             	}
         	});
     	},
@@ -499,14 +500,14 @@ var dappleth = (function(){
         getScoresForOneFriendInternal: function(friendAddress, favorList, index, cb) {
 			if(favorList && favorList.length && (index < favorList.length) && favorList[index]) {
             	var favorName = favorList[index];
-            	dappContract.getPerformedFavors($service.address(), friendAddress, web3.fromAscii(favorName),
+            	dappContract.getPerformedFavors($service.address(), friendAddress, web3.fromAscii(favorName), {'from':$service.address()},
             		function(error, result) {
             			if(error) {
             				console.log("Failed to get received favors", error)
 						} else {
                             var toMe = result.toNumber();
                             console.log("I received", toMe, "favors from ", friendAddress, "for", favorName, "on", Dapp.Contracts[0].Address);
-                            dappContract.getPerformedFavors(friendAddress, $service.address(), web3.fromAscii(favorName),
+                            dappContract.getPerformedFavors(friendAddress, $service.address(), web3.fromAscii(favorName), {'from':$service.address()},
                                 function (error, result) {
                                     if (error) {
                                         console.log("Failed to get given favors", error)
