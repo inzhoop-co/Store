@@ -263,8 +263,8 @@
 			],
 			"Logo" :{ 
 				"Full":"logo.png",
-				"Mini":"logo.png",
-				"Banner":"logo.png"
+				"Mini":"logomini.png",
+				"Banner":"logoOr.png"
 			},
 			"Descriptions" : {
 				"Title": "Favor",

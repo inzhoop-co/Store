@@ -10,11 +10,11 @@
             <i class="icon ion-information-circled"></i>
             <p>Here you can add new types of favors to track with Favor Tokens. Just type in the name of the new favor and tap "Add" button.</p>
         </div>
-        <div class="card">
+        <div class="list">
             <label class="item item-input">
                 <input type="text" id="iNewFavorName" placeholder="Name of the favor" ng-model="newFavorName">
             </label>
-            <button class="button button-block button-energized" ng-click="addNewFavorName(modal)"><i class="icon ion-ios-plus-outline"></i> Add</button>
+            <button class="button button-block  button-calm button-outline" ng-click="addNewFavorName(modal)"><i class="icon ion-ios-plus-outline"></i> Add</button>
         </div>
         <ion-list class="list" ng-model="favorNames" id="favorList">
             <ion-item class="item" ng-repeat="favor in favorNames track by $index">

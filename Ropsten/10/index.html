@@ -8,7 +8,11 @@
 	Use <style> to add your custom additional css
 */
 </style>
-<dappleth-header></dappleth-header>
+<dappleth-header styleclass="bar bar-header bar-royal">
+	<button class="button button-clear" on-touch="openFavorsDialog()">
+	  <i class="icon ion-ios-cog"></i>
+	</button>
+</dappleth-header>
 <dappleth-content>
 <!-- 	Content Page
 		Write your Page using all the components of Ionic 1.x
@@ -22,25 +26,33 @@
 	
 		You can otherwise write your own html and css in this content page
 -->
-<div class="card">
-    <div class="item item-text-wrap item-icon-left">
-        <i class="icon ion-information-circled"></i>
-        <p>{{getCurrentTip()}}</p>
-    </div>
-    <div class="item item-divider">
-        <button class="button button-small icon-right ion-arrow-right-b" ng-click="nextTip()">Next tip</button>
-    </div>
-</div>
-    <div class="card">
-        <div class="item item-text-wrap">
-            You have <b>{{getMyFavorBalance()}}</b> Favor Tokens
-        </div>
+	<ion-slide-box auto-play="true" does-continue="true" on-slide-changed="slideHasChanged($index)">
+	  <ion-slide>
+	    <div class="card">
+	    	<div class="item item-text-wrap item-icon-left item-icon-right">
+	        	<i class="icon ion-information-circled"></i>
+	        	<p>Swipe left over a contact to see options or tap contact to see favors.</p>
+	    	</div>
 
-    <div class="button-bar">
-        <button class="button icon-left ion-ios-cart" ng-click="openBuyDialog()" style="overflow:visible; padding: 0 10px">Buy tokens</button>
-        <button class="button icon-left ion-ios-cog" ng-click="openFavorsDialog()" style="overflow:visible; padding: 0 10px">Manage favors</button>
-    </div>
-    </div>
+	    </div>
+	  </ion-slide>
+	  <ion-slide>
+	    <div class="card">
+	    	<div class="item item-text-wrap item-icon-left item-icon-right">
+	        	<i class="icon ion-information-circled"></i>
+	        	<p>When someone does you a favor, send them a Favor Token.</p>
+	    	</div>
+	    </div>
+	  </ion-slide>
+	  <ion-slide>
+	    <div class="card">
+	    	<div class="item item-text-wrap item-icon-left item-icon-right">
+	        	<i class="icon ion-information-circled"></i>
+	        	<p>Manage personal favor names using <i class="ion-ios-cog"></i> up right button </p>
+	    	</div>
+	    </div>
+	  </ion-slide>
+	</ion-slide-box>
 	<ion-list class="list">
 		<ion-item class="item item-avatar item-icon-right" ng-repeat="user in getFriends() | filter:search track by $index" ng-click="openUserDialog(user)">
 			<img ng-src="{{user.icon}}"/>
@@ -57,4 +69,11 @@
 
 </dappleth-content>
 <dappleth-footer>
+	<div class="bar bar-footer bar-royal">
+    <a class="button icon-left ion-ios-cart button-clear" ng-click="openBuyDialog()">Buy tokens </a>
+    <button class="button button-clear">
+      Balance
+      <span class="badge badge-stable" style="font-size: 8px">{{getMyFavorBalance()}}</span>
+    </button>
+  </div>
 </dappleth-footer>
