@@ -34,46 +34,57 @@ var dappleth = (function(){
 		//reference to token contract
 		favorToken = web3.eth.contract(Dapp.Contracts[1].ABI).at(Dapp.Contracts[0].Address);
 		//create local copy of friend objects to store scores
-        friendAddressMap = {};
+        context.getFavorPrice();
+        //extend angular core scope with the scope of this Dapps
+        angular.extend($scope, context);
+        $service.loadingOn();
+
+        initFriends(context, function() {
+            initFavors(context, function() {
+                initHistory(context, function() {
+                    $service.loadingOff();
+                });
+            });
+        });
+	};
+
+	var initHistory = function(context, cb) {
         pendingTransactions = $service.getKey(Dapp.GUID,'pendingTransactions');
+        if(!(pendingTransactions && pendingTransactions instanceof Array)) {
+            pendingTransactions = [];
+            $service.storeData(Dapp.GUID, "pendingTransactions", pendingTransactions);
+        }
+        context.loadHistory(function() {
+            cb();
+        });
+    }
+
+	var initFriends = function(context, cb) {
+        friendAddressMap = {};
         friendList = [];
         $scope.friends.forEach(function(usr) {
             var frObj = {me:{}, them:{}, confirmations:{},name:usr.name, icon:usr.icon, addr:usr.addr};
             friendAddressMap[usr.addr] = frObj;
             friendList.push(frObj);
         });
-
-        context.getFavorPrice();
-        $service.loadingOn();
-        //extend angular core scope with the scope of this Dapps
-        angular.extend($scope, context);
-        context.updatePendingTransactions(function() {
-            continueInit($scope, $service);
-            $service.loadingOff();
-        });
-
-	};
-
-    var continueInit = function(scope, service) {
-        favorNames = service.getKey(Dapp.GUID,'favorNames');
-        if(!favorNames) {
-            favorNames = ["Just a favor", "Paid for coffee"];
-            tips.push("We have added a couple of common favors for you: 'Paid for coffee' and 'Just a favor', so you can get started. Tap 'Manage favors' to create your own.");
-            currentTip = (tips.length - 1);
-        } else {
-            var cleanNames = [];
-            for(var i in favorNames) {
-                if(favorNames[i]) {
-                    cleanNames.push(favorNames[i]);
-                }
+        cb();
+    }
+    var initFavors = function(context, cb) {
+        favorNames = $service.getKey(Dapp.GUID,'favorNames');
+        context.getFavorNames(context, function() {
+            if(!favorNames) {
+                favorNames = ["Just a favor", "Paid for coffee"];
+                tips.push("We have added a couple of common favors for you: 'Paid for coffee' and 'Just a favor', so you can get started. Tap 'Manage favors' to create your own.");
+                currentTip = (tips.length - 1);
+            } else {
+                $service.storeData(Dapp.GUID, "favorNames", favorNames);
             }
-            favorNames = cleanNames;
-            service.storeData(Dapp.GUID, "favorNames", favorNames);
-        }
-        currentTip = service.getKey(Dapp.GUID,'currentTip') % tips.length;
-        if(!currentTip) {
-            currentTip = 0;
-        }
+            currentTip = $service.getKey(Dapp.GUID,'currentTip') % tips.length;
+            if(!currentTip) {
+                currentTip = 0;
+            }
+            cb();
+        })
     }
 
 	//exit internal method
@@ -220,7 +231,55 @@ var dappleth = (function(){
             return this.currentContact.them[favor] ? this.currentContact.them[favor] : "0";
         },
         updatePendingTransactions: function(cb) {
-			console.log("Will load transactions");
+            if(!pendingTransactions || pendingTransactions.length == 0 || !(pendingTransactions instanceof Array)) {
+                pendingTransactions = $service.getKey(Dapp.GUID,'pendingTransactions');
+                if(!(pendingTransactions && pendingTransactions instanceof Array)) {
+                    pendingTransactions = [];
+                    $service.storeData(Dapp.GUID, "pendingTransactions", pendingTransactions);
+                }
+                cb();
+            } else {
+                var pTx = pendingTransactions.pop();
+                web3.eth.getTransactionReceipt(pTx.txHash, function(err, receipt) {
+                    if(err) {
+                        console.log("Failed to load transaction receipt for",pTx.txHash, err);
+                    } else {
+                        if(receipt) {
+                            if(receipt.status) {
+                                $scope.markTransactionComplete(pTx.txHash)
+                            }
+                        }
+                    }
+                    $scope.updatePendingTransactions(cb);
+                })
+            }
+        },
+        getFavorNames: function(context, cb) {
+            dappContract.getUserFavors({'from':$service.address()},
+                function(error, result) {
+                    if(error) {
+                        console.log("Failed to find user's favor names", error)
+                    } else {
+                        console.log("Found favor names " + JSON.stringify(result))
+                        if(result && result instanceof Array && result.length > 0) {
+                            for(var i = 0; i < result.length; i++) {
+                                var favorName = web3.toAscii(result[i]).replace(/\0/g, '');
+                                if(favorNames.indexOf(favorName) < 0) {
+                                    favorNames.push(favorName);
+                                    console.log("Added favor name ",favorName);
+                                }
+                                if(blockChainFavors.indexOf(favorName) < 0) {
+                                    blockChainFavors.push(favorName);
+                                }
+                            }
+                            $service.storeData(Dapp.GUID, "favorNames", favorNames);
+                        }
+                        cb();
+                    }
+                });
+        },
+        loadHistory: function(cb) {
+			console.log("Will load transaction history");
             $service.loadingOn();
             for(var i in friendAddressMap) {
                 friendAddressMap[i].me = {};
@@ -331,15 +390,16 @@ var dappleth = (function(){
 		},
         markTransactionComplete: function(txHash) {
         	try {
-				if(!pendingTransactions) {
-					pendingTransactions = {}; //new Map<string /* txhash */,string /* friend address */>();
-				}
-				if(pendingTransactions) {
-					if(pendingTransactions[txHash]) {
-						pendingTransactions[txHash] = null;
-						console.log("Marked pending transaction complete",txHash);
-					}
-         	   }
+				if(!(pendingTransactions && pendingTransactions instanceof Array)) {
+					pendingTransactions = [];
+				} else {
+				    for(var i = pendingTransactions.length - 1; i > -1; i--) {
+				        if(pendingTransactions[i] && pendingTransactions[i].txHash == txHash) {
+                            pendingTransactions[i] = null;
+                            pendingTransactions.splice(i, 1);
+                        }
+                    }
+                }
 			} catch (error) {
 				console.error("failed to mark pending transactions complete");
 			}
@@ -351,8 +411,7 @@ var dappleth = (function(){
             		console.log("failed to update pending transactions", error);
                 	cb(error);
             	} else {
-            		console.log("Updated pending transactions");
-                    //cb(null);
+            		console.log("Updated pending transactions. Will load scores for",friendAddress);
                 	$scope.getScoresForOneFriendInternal(friendAddress, favorList, index, cb);
             	}
         	});
@@ -366,16 +425,6 @@ var dappleth = (function(){
             var value = currentPriceWei * amount;
             var params = [$service.address()];
             console.log("Sending ",value,"to Turnsy");
-            /*dappContract.buyTokens($service.address(), {'value':value, 'gas': gasLimit, 'gasPrice' : gasPrice}, function(error, txHash) {
-                if(error) {
-                    console.log("Error", error);
-                }
-                if(txHash) {
-                    console.log("transaction hash", txHash);
-                } else {
-                    console.log("Error: empty transaction hash");
-                }
-            });*/
             $service.transactionCall(dappContract, "buyTokens", params, value, gasLimit, gasPrice).then(
                 function(txHash) {
                     if(!txHash) {
@@ -407,11 +456,11 @@ var dappleth = (function(){
             } catch (ex) {
                 //ignore
             }
-            $service.loadingOn();
+            //$service.loadingOn();
             var selectedFavor = favor ? favor : this.selectedFavor;
             console.log("tapped send token for",selectedFavor);
             if(this.getMyFavorBalance() < 1) {
-                $service.loadingOff();
+               // $service.loadingOff();
                 $service.popupAlert("Error", "You do not have a token to send. You need to earn or buy a token before you can send it.");
             } else {
                var gasLimit = 3000000;
@@ -419,26 +468,27 @@ var dappleth = (function(){
                var ctx = this;
                $scope.loadFriendName(ctx.currentContact.addr, ctx.currentContact.name, function(error, friendName) {
                    if(error) {
-                       $service.loadingOff();
+                       //$service.loadingOff();
                        console.log("Error", error);
                        $service.popupAlert("Error", "Failed to load friend from blockchain:" + error);
                    } else {
                        dappContract.receiveFavor(ctx.currentContact.addr, web3.fromAscii(selectedFavor), 1, {'from':$service.address(), 'gas': gasLimit, 'gasPrice' : gasPrice}, function(error, txHash) {
                            if(error) {
-                               $service.loadingOff();
+                               //$service.loadingOff();
                                console.log("Error", error);
                                $service.popupAlert("Error", "Transaction failed:" + error);
                            } else if(txHash) {
-                               $service.loadingOff();
+                               //$service.loadingOff();
                                console.log("transaction hash", txHash);
                                if(!pendingTransactions) {
-                                   pendingTransactions = {};
+                                   pendingTransactions = [];
                                }
-                               pendingTransactions[txHash] = ctx.currentContact.addr;
+                               var pTransaction = {'txHash':txHash, 'friendAddr':ctx.currentContact.addr, 'favorName':selectedFavor};
+                               pendingTransactions.push(pTransaction);
                                $service.storeData(Dapp.GUID, "pendingTransactions", pendingTransactions);
                                $service.popupAlert("Success", "You sent a Favor Token to " + ctx.currentContact.name + " for " + selectedFavor + ". Transaction hash:" + txHash);
                            } else {
-                               $service.loadingOff();
+                               //$service.loadingOff();
                                console.log("Error: empty transaction hash");
                                $service.popupAlert("Error", "Transaction failed: 'Empty transaction hash'");
                            }
@@ -533,9 +583,9 @@ var dappleth = (function(){
                                                             fObj.confirmations[favorName] = requestedConfirmations;
                                                             console.log("Set friend's score for", favorName, "to me:", fObj.me[favorName], " x them:", fObj.them[favorName]);
                                                             if (pendingTransactions) {
-                                                                for (var k in pendingTransactions) {
-                                                                    var v = pendingTransactions[k];
-                                                                    if (v == friendAddress) {
+                                                                for (var i in pendingTransactions) {
+                                                                    var t = pendingTransactions[i];
+                                                                    if (t.friendAddr == friendAddress && t.favorName == favorName) {
                                                                         var score = fObj.them[favorName] + 1;
                                                                         fObj.them[favorName] = score;
                                                                         friendAddressMap[friendAddress] = fObj;
