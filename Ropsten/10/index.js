@@ -42,7 +42,7 @@ var dappleth = (function(){
             friendAddressMap[usr.addr] = frObj;
             friendList.push(frObj);
         });
-        //context.getFavorNames();
+
         context.getFavorPrice();
         $service.loadingOn();
         //extend angular core scope with the scope of this Dapps
@@ -483,37 +483,7 @@ var dappleth = (function(){
             $service.storeData(Dapp.GUID, "favorNames", favorNames);
             this.newFavorName = "";
         },
-        getFavorNames: function() {
-            $service.loadingOn();
-            try {
-                console.log(dappContract.getUserFavors());
-            } catch (ex) {
-                console.log(ex);
-            }
 
-            dappContract.getUserFavors({'from':$service.address()},
-            	function(error, result) {
-                    if(error) {
-                        console.log("Failed to find user's favor names", error)
-                        $service.loadingOff();
-                    } else {
-                        blockChainFavors = [];
-                        console.log("Found favor names " + JSON.stringify(result))
-                        if(result && result instanceof Array && result.length > 0) {
-                            for(var i = 0; i < result.length; i++) {
-                                var favorName = web3.toAscii(result[i]).replace(/\0/g, '');
-                                if(favorNames.indexOf(favorName) < 0) {
-                                    favorNames.push(favorName);
-                                    console.log("Added favor name ",favorName);
-                                }
-                                blockChainFavors.push(favorName);
-                            }
-                            $service.storeData(Dapp.GUID, "favorNames", favorNames);
-                        }
-                        $service.loadingOff();
-					}
-        		});
-    	},
 		/**
 		 * Computes scores for one friend recursing through the list of favors. To compute the score for a given favor:
 		 *  1. fetch received favors from contract
