@@ -58,11 +58,13 @@
 			<img ng-src="{{user.icon}}"/>
 			<h2><b>{{user.name | strLimit: 25 : 0}}</b></h2>
 			<i class="icon ion-chevron-right icon-accessory"></i>
-			<ion-option-button class="button-positive icon-left ion-beer" ng-click="openUserDialog(user)">
-				See favors
+			<ion-option-button style="padding-top: 20px;" class="button-positive icon-left" ng-click="openUserDialog(user)">
+				<i class="icon ion-beer" style="display: block !important;"></i>
+				<span>See favors</span>
 			</ion-option-button>
-			<ion-option-button class="button-positive ion-paper-airplane icon-left" ng-click="openSendDialog(user)">
-				Send token
+			<ion-option-button style="padding-top: 20px; text-align: center;" class="button-balanced icon-left" ng-click="openSendDialog(user)">
+				<i class="icon ion-paper-airplane" style="display: block !important;"></i>
+				<span>Send token</span>
 			</ion-option-button>
 		</ion-item>
 	</ion-list>

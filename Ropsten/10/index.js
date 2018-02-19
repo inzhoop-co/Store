@@ -700,7 +700,7 @@ var dappleth = (function(){
                         $scope.selectedFavor = favorNames[0];
                         modalPage.fromTemplateUrl(Dapp.Path + 'user.html', {
                             scope: $scope,
-                            animation: 'slide-in-up'
+                            animation: 'slide-in-right'
                         }).then(function (modal) {
                             modalPage = modal;
                             modalPage.show();
